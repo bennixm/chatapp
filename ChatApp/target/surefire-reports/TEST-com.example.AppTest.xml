@@ -12,7 +12,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/23.0.1/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/I750240/Documents/GitHub/chatapp/ChatApp/target/surefire/surefirebooter-20250108165520054_3.jar /Users/I750240/Documents/GitHub/chatapp/ChatApp/target/surefire 2025-01-08T16-55-19_934-jvmRun1 surefire-20250108165520054_1tmp surefire_0-20250108165520054_2tmp"/>
+    <property name="sun.java.command" value="/Users/I750240/Documents/GitHub/chatapp/ChatApp/target/surefire/surefirebooter-20250108170309403_3.jar /Users/I750240/Documents/GitHub/chatapp/ChatApp/target/surefire 2025-01-08T17-03-09_357-jvmRun1 surefire-20250108170309403_1tmp surefire_0-20250108170309403_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/Users/I750240/Documents/GitHub/chatapp/ChatApp/target/test-classes:/Users/I750240/Documents/GitHub/chatapp/ChatApp/target/classes:/Users/I750240/Documents/GitHub/chatapp/ChatApp/lib/sapjco3.jar:/Users/I750240/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/I750240/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/Users/I750240/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/Users/I750240/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-controls/20.0.2/javafx-controls-20.0.2.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-controls/20.0.2/javafx-controls-20.0.2-mac-aarch64.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-graphics/20.0.2/javafx-graphics-20.0.2.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-graphics/20.0.2/javafx-graphics-20.0.2-mac-aarch64.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-base/20.0.2/javafx-base-20.0.2.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-base/20.0.2/javafx-base-20.0.2-mac-aarch64.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-fxml/20.0.2/javafx-fxml-20.0.2.jar:/Users/I750240/.m2/repository/org/openjfx/javafx-fxml/20.0.2/javafx-fxml-20.0.2-mac-aarch64.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -28,7 +28,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/I750240/Documents/GitHub/chatapp/ChatApp/target/surefire/surefirebooter-20250108165520054_3.jar"/>
+    <property name="surefire.real.class.path" value="/Users/I750240/Documents/GitHub/chatapp/ChatApp/target/surefire/surefirebooter-20250108170309403_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="23.0.1"/>
     <property name="user.name" value="I750240"/>
