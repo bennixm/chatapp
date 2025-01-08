@@ -4,33 +4,33 @@ import java.io.*;
 import java.net.*;
 
 public class ChatClient {
-    private static final String SERVER_ADDRESS = "localhost"; // Server address
+    private static final String SERVER_ADDRESS = "localhost";
     private static final int PORT = 12345;
+    private static Socket socket;
+    private static PrintWriter out;
+    private static BufferedReader in;
 
-    public static void main(String[] args) {
-        try (Socket socket = new Socket(SERVER_ADDRESS, PORT);
-             BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+    public static void connectToServer() {
+        try {
+            socket = new Socket(SERVER_ADDRESS, PORT);
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-            System.out.println("Connected to chat server!");
+    public static void sendMessage(String message) {
+        if (out != null) {
+            out.println(message);
+        }
+    }
 
-            // Thread to read messages from the server
-            new Thread(() -> {
-                try {
-                    String serverMessage;
-                    while ((serverMessage = in.readLine()) != null) {
-                        System.out.println("Server: " + serverMessage);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-            // Main thread to send messages to the server
-            String message;
-            while ((message = input.readLine()) != null) {
-                out.println(message);
+    public static void listenForMessages() {
+        try {
+            String serverMessage;
+            while ((serverMessage = in.readLine()) != null) {
+                ChatApp.appendMessage("Server: " + serverMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
