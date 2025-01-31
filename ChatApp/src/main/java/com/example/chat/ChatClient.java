@@ -4,33 +4,40 @@ import java.io.*;
 import java.net.*;
 
 public class ChatClient {
-    private static final String SERVER_ADDRESS = "localhost";
-    private static final int PORT = 12345;
-    private static Socket socket;
-    private static PrintWriter out;
-    private static BufferedReader in;
-
-    public static void connectToServer() {
+    private Socket socket;
+    private PrintWriter out;
+    private BufferedReader in;
+    
+    // Assuming the server is running on localhost and port 12345
+    private String serverAddress = "localhost";
+    private int port = 12345;
+    
+    public void connect() {
         try {
-            socket = new Socket(SERVER_ADDRESS, PORT);
-            out = new PrintWriter(socket.getOutputStream(), true);
+            socket = new Socket(serverAddress, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+            System.out.println("Connected to server");
+            
+            // Listening for incoming messages in a separate thread
+            new Thread(this::listenForMessages).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    public static void sendMessage(String message) {
+    
+    public void sendMessage(String message) {
         if (out != null) {
             out.println(message);
         }
     }
-
-    public static void listenForMessages() {
+    
+    private void listenForMessages() {
         try {
-            String serverMessage;
-            while ((serverMessage = in.readLine()) != null) {
-                ChatApp.appendMessage("Server: " + serverMessage);
+            String message;
+            while ((message = in.readLine()) != null) {
+                // Handle received message (update GUI or log)
+                System.out.println("Server says: " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();

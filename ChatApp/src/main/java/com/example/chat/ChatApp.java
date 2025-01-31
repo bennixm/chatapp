@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 public class ChatApp extends Application {
     private static TextArea chatDisplay;
+    private static ChatClient client;  // Assuming you have a ChatClient class to handle connections
 
     @Override
     public void start(Stage primaryStage) {
@@ -20,7 +21,7 @@ public class ChatApp extends Application {
         Button sendButton = new Button("Send");
 
         HBox inputArea = new HBox(10, messageInput, sendButton);
-        inputArea.setHgrow(messageInput, Priority.ALWAYS);
+        HBox.setHgrow(messageInput, Priority.ALWAYS);  // Fix here, use HBox.setHgrow()
 
         VBox root = new VBox(10, chatDisplay, inputArea);
         root.setStyle("-fx-padding: 10; -fx-background-color: #f0f0f0;");
@@ -30,7 +31,7 @@ public class ChatApp extends Application {
             if (!message.isEmpty()) {
                 appendMessage("You: " + message);
                 messageInput.clear();
-                ChatClient.sendMessage(message);
+                client.sendMessage(message);  // Calling sendMessage from ChatClient
             }
         });
 
@@ -38,7 +39,8 @@ public class ChatApp extends Application {
         primaryStage.setScene(new Scene(root, 400, 300));
         primaryStage.show();
 
-        new Thread(ChatClient::listenForMessages).start();
+        // Start a new thread to handle client connection
+        new Thread(() -> client.connect()).start();  // Use lambda to wrap method call in Runnable
     }
 
     public static void appendMessage(String message) {
@@ -46,7 +48,8 @@ public class ChatApp extends Application {
     }
 
     public static void main(String[] args) {
-        ChatClient.connectToServer();
+        // Assuming ChatClient has a static method to initialize connection
+        client = new ChatClient();  // Initialize the client
         launch(args);
     }
 }
