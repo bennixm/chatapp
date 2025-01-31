@@ -1,2 +1,2 @@
 # chatapp
-Chat app in Java using GUI
+Chat app in Java 
