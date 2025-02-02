@@ -1,12 +1,13 @@
 <template>
+  <section>
+    <h2>ChaPage</h2>
+  </section>
   <div>
     <div v-for="message in messages" :key="message.id">
       <p>{{ message.user }}: {{ message.content }}</p>
     </div>
     <input v-model="newMessage" @keyup.enter="sendMessage" />
   </div>
-
-  Chatpageee
 </template>
 
 <script>

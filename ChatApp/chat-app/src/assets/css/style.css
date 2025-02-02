@@ -1,3 +1,112 @@
-nav{
+.navbar-element{
+    width:15vw;
+    margin-left:3vh;
+    height: 84vh;
+    background-color: rgba(255, 255, 255, 0.228);
+    border-radius: 20px;
+    border: 1px solid rgb(255, 255, 255);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.9s;
+    padding:3vh;
+}
+body{
+    background-color: #3b95829c;
+}
+.navbar .links ul{
+    padding:0;
+    margin:0;
+}
+.navbar .links ul li{
+    text-align: left;
+    padding-left:10px;
+    width:100%;
+    padding:10px;
+    transition:all .5s;
+    cursor:pointer;
+    border-radius:5px;
+}
+.navbar .links ul li:hover{
+    background-color: rgba(255, 255, 255, 0.449);
+}
+.navbar .links ul li a{
+    text-decoration: none;
+    color: black;
+    font-size:18px;
+}
+.navbar .links ul li a i{
+    padding-right:10px;
+    font-size:23px;
+}
+.user-login{
+    padding:5px;
+    padding-bottom:10px;
+    padding-top:10px;
+    display:flex;
+    flex-direction: row;
+    border-bottom:1px solid white;
+}
+.navbar-head-title{
+    display:flex;
+    flex-direction: column;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.navbar-head-title span{
+    text-align: left;
     color:black;
+}
+.user-login a{
+    text-decoration: none;
+    color:black;
+}
+.user-login i{
+    font-size:17px;
+    color:black;
+}
+.navbar{
+    display:flex;
+    flex-direction: column;
+}
+.links{
+    display:flex;
+    flex-direction: column;
+}
+ul{
+    list-style-type: none;
+}
+.user-img{
+    border-radius:50%;
+    width:30px;
+    height:30px;
+    background-image:url(../images/user.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right:10px;
+}
+.user-login a{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+}
+.user-auth{
+    height: max-content;
+}
+.content{
+    height: max-content;
+    min-height: 84vh;
+    background-color: rgba(255, 255, 255, 0.228);
+    border-radius: 20px;
+    border: 1px solid rgb(255, 255, 255);
+    backdrop-filter: blur(20px);
+    width:73%;
+    margin-left:2%;
+    padding:3vh;
+}
+.content-grid{
+    width:100%;
+    display:flex;
+    flex-direction: row;
 }

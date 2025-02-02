@@ -4,7 +4,7 @@ import ChatPage from '@/views/ChatPage.vue';
 
 const routes = [
   { path: '/', component: HomePage },
-  { path: '/chat', component: ChatPage }
+  { path: '/chatapp', component: ChatPage }
 ];
 
 const router = createRouter({
