@@ -3,45 +3,34 @@
     <h2>ChaPage</h2>
   </section>
   <div>
-    <div v-for="message in messages" :key="message.id">
-      <p>{{ message.user }}: {{ message.content }}</p>
-    </div>
-    <input v-model="newMessage" @keyup.enter="sendMessage" />
+    <h1>{{ message }}</h1>
+    <button @click="fetchHello">Fetch Hello from Backend</button>
   </div>
 </template>
 
 <script>
-import io from 'socket.io-client';
+import axios from 'axios';
+
 
 export default {
-name: 'ChatPage',
+  name: 'ChatPage',
     props: {
       msg: String
 },
-  data() {
-    return {
-      socket: null,
-      messages: [],
-      newMessage: ''
-    };
-  },
-  created() {
-    this.socket = io('http://localhost:8080');
-    this.socket.on('chat-message', (message) => {
-      this.messages.push(message);
-    });
-  },
-  methods: {
-    sendMessage() {
-      if (this.newMessage.trim() !== '') {
-        const message = {
-          user: 'User1',
-          content: this.newMessage
-        };
-        this.socket.emit('send-message', message);
-        this.newMessage = '';
-      }
+data() {
+  return {
+    message: 'Welcome to Vue.js!',
+  };
+},
+methods: {
+  async fetchHello() {
+    try {
+      const response = await axios.get('http://backend:8080/api/hello');
+      this.message = response.data;  // Update message with the backend response
+    } catch (error) {
+      console.error('There was an error!', error);
     }
-  }
+  },
+},
 };
 </script>
