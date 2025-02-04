@@ -19,17 +19,8 @@ public class UserController {
 
     @PostMapping("/save")
     public ResponseEntity<String> saveUser(@RequestBody UserDTO userDTO) {
-        try {
-
-            boolean isRegistered = userService.addUser(userDTO);
-            if (isRegistered) {
-                return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("An error occurred during registration", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            String username = userService.addUser(userDTO);
+              return new ResponseEntity<>("User " + username + " registered successfully", HttpStatus.OK);
     }
 
     @PostMapping("/login")
