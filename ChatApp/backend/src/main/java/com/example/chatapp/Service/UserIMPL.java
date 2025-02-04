@@ -42,7 +42,7 @@ public class UserIMPL implements UserService {
 
         userRepository.save(user);
 
-        return user.getUserename();
+        return user.getUsername();
     }
     UserDTO userDTO;
 

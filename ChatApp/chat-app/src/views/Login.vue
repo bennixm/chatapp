@@ -64,7 +64,7 @@ export default {
                   else if(data.message == "Login Success")
                   {
 
-                    this.$router.push({ name: 'Home' })
+                    this.$router.push({ name: 'HomePage' })
                   }
                   else
                   {

@@ -56,7 +56,7 @@ export default {
                 console.log(data);
                 try
                 {
-                  alert("User reggistered Successfully");
+                  alert("User registered Successfully");
 
                 }
                 catch(err)
