@@ -2,7 +2,7 @@
     <header class="navbar-element">
       <div class="nav-header user-login">
         <div class="user-img"></div>
-        <router-link to="/auth"><div class="user-auth"> Login</div></router-link>
+        <router-link to="/login"><div class="user-auth"> Login</div></router-link>
       </div>
        <nav class="navbar">
         <div class="navbar-head-title"><span>Pages</span></div>

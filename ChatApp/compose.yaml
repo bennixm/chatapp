@@ -1,5 +1,4 @@
 
-
 services:
   backend:
     build:
@@ -8,6 +7,8 @@ services:
       - "8080:8080"
     networks:
       - app-network
+    depends_on:
+      - mysql # Make sure the backend waits for MySQL to be ready
 
   frontend:
     build:
@@ -19,6 +20,23 @@ services:
     depends_on:
       - backend
 
+  mysql:
+    image: mysql:8.0 # Use MySQL 8.0 (you can choose the version you prefer)
+    container_name: mysql-chat-app
+    environment:
+      MYSQL_ROOT_PASSWORD: chatapp99  # Set the MySQL root password
+      MYSQL_DATABASE: chatapp         # Create a default database
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"  # Expose MySQL on port 3306
+    volumes:
+      - mysql-data:/var/lib/mysql  # Persist data across container restarts
+
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

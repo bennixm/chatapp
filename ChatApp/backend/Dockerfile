@@ -17,6 +17,12 @@ RUN mvn clean package -DskipTests=true
 # Stage 2: Production image
 FROM sapmachine:21-jdk-headless-ubuntu-20.04 AS prod
 
+# Install wget and dockerize to wait for MySQL to be ready
+RUN apt-get update && apt-get install -y wget \
+    && wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz \
+    && tar -xvzf dockerize-linux-amd64-v0.6.1.tar.gz \
+    && mv dockerize /usr/local/bin/
+
 # Set the working directory
 WORKDIR /app
 
@@ -30,5 +36,5 @@ ENV SPRING_SERVER_PORT=8081 \
 # Expose the application port
 EXPOSE 8081
 
-# Entry point for the application
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Wait for MySQL to be available before starting the Spring Boot application
+ENTRYPOINT ["sh", "-c", "dockerize -wait tcp://mysql:3306 -timeout 60s && java -jar /app/app.jar"]
