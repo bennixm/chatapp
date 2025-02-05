@@ -49,16 +49,16 @@ export default {
   },
   methods: {
     LoginData() {
-      axios.post("http://backend:8085/api/v1/user/login", this.user)
+      axios.post("http://0.0.0.0:8085/api/v1/user/login", this.user)
           .then(({ data }) => {
             console.log(data);
 
-            // Check for specific response messages
             if (data.message === "Email not exists") {
               alert("Email does not exist.");
             } else if (data.message === "Login Success") {
               this.$router.push({ name: 'HomePage' });
             } else {
+              // Check for specific response messages
               alert("Incorrect Email or Password.");
             }
           })

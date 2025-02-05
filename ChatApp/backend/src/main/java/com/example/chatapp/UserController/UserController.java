@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@CrossOrigin("http://localhost:8081") // Vue.js frontend origin
+@CrossOrigin(origins="*")
 
 public class UserController {
 
