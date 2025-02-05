@@ -1,72 +1,71 @@
 <template>
-
-  <div class="row">
-
-    <div class="col-sm-4" >
-      <h2 align="center"> Login</h2>
-
+  <div class="panel">
+    <div class="box">
+      <span class="borderLine"></span>
       <form @submit.prevent="LoginData">
-
-
-        <div class="form-group" align="left">
-          <label>Email</label>
-          <input type="email" v-model="user.email" class="form-control"  placeholder="Email">
+        <h2>Sign in</h2>
+        <div class="inputBox">
+          <input type="email" v-model="user.email" class="form-control" required />
+          <span>Email</span>
+          <i></i>
         </div>
-
-
-        <div class="form-group" align="left">
-          <label>Password</label>
-          <input type="password" v-model="user.password" class="form-control"  placeholder="Password">
+        <div class="inputBox">
+          <input type="password" v-model="user.password" class="form-control" required />
+          <span>Password</span>
+          <i></i>
         </div>
-        <br/>
-
-        <button type="submit" class="btn btn-primary">Login</button>
+        <div class="links">
+          <router-link to="/password-recovery"> Forgot Password</router-link>
+          <router-link to="/register"> Sign up</router-link>
+        </div>
+        <button type="submit" id="submit" class="btn btn-primary">Login</button>
       </form>
     </div>
   </div>
-
 </template>
 
 <script>
-
 import axios from 'axios';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import { reactive } from 'vue';
 
 export default {
   name: 'LoginPage',
-  data () {
-    return {
-      result: {},
-      user:{
-        email: '',
-        password: ''
-      }
-    }
-  },
-  created() {
-  },
-  mounted() {
-    console.log("mounted() called.......");
-  },
-  methods: {
-    LoginData() {
-      axios.post("http://0.0.0.0:8085/api/v1/user/login", this.user)
-          .then(({ data }) => {
-            console.log(data);
+  setup() {
+    const store = useStore();
+    const router = useRouter();
 
-            if (data.message === "Email not exists") {
-              alert("Email does not exist.");
-            } else if (data.message === "Login Success") {
-              this.$router.push({ name: 'HomePage' });
-            } else {
-              // Check for specific response messages
-              alert("Incorrect Email or Password.");
-            }
-          })
-          .catch(err => {
-            console.error("An error occurred:", err);
-            alert("Error, please try again.");
-          });
-    }
+
+    const user = reactive({
+      email: '',
+      password: ''
+    });
+
+    const LoginData = async () => {
+      try {
+        const response = await axios.post("http://0.0.0.0:8085/api/v1/user/login", user);
+        console.log(response.data);
+
+        if (response.data.message === "Login Success") {
+
+          store.commit('setUsername', response.data.username);
+
+          router.push({ name: 'ChatPage' });
+        } else {
+          alert("Incorrect Email or Password.");
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        alert("Error, please try again.");
+      }
+    };
+
+    return { user, LoginData };
   }
-}
+};
 </script>
+
+<style scoped>
+/* Add your styles here */
+</style>

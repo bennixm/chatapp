@@ -1,33 +1,28 @@
 <template>
-  <div class="card" align="left">
-    <div class="card-header">Register Form</div>
-    <div class="card-body">
+  <div class="panel">
+    <div class="box">
+      <span class="borderLine"></span>
       <form @submit.prevent="saveData">
-        <label>Employee Name</label>
-        <input
-            type="text"
-            v-model="user.username"
-            name="username"
-            id="username"
-            class="form-control"
-        />
-        <label>Email</label>
-        <input
-            type="email"
-            v-model="user.email"
-            name="email"
-            id="email"
-            class="form-control"
-        />
-        <label>Password</label>
-        <input
-            type="password"
-            v-model="user.password"
-            name="password"
-            id="password"
-            class="form-control"
-        />
-        <input type="submit" value="Save" class="btn btn-success" />
+        <h2>Sign up</h2>
+        <div class="inputBox">
+          <input type="text" v-model="user.username" name="username" id="username" class="form-control" required>
+          <span>Username</span>
+          <i></i>
+        </div>
+        <div class="inputBox">
+          <input type="email" v-model="user.email" name="email" id="email" class="form-control" required>
+          <span>Email</span>
+          <i></i>
+        </div>
+        <div class="inputBox">
+          <input type="password" v-model="user.password" name="password" id="password" class="form-control" required>
+          <span>Password</span>
+          <i></i>
+        </div>
+        <div class="links">
+          <router-link to="/login"> Sign in</router-link>
+        </div>
+        <button type="submit" id="submit" class="btn btn-primary">Login</button>
       </form>
     </div>
   </div>

@@ -1,6 +1,6 @@
 package com.example.chatapp.Repository;
 
-import com.example.chatapp.Entity.User;
+import com.example.chatapp.Entity.AppUser;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @EnableJpaRepositories
 @Repository
-public interface UserRepository extends JpaRepository<User,Integer>
+public interface UserRepository extends JpaRepository<AppUser,Integer>
 {
-    Optional<User> findOneByEmailAndPassword(String email, String password);
+    Optional<AppUser> findOneByEmailAndPassword(String email, String password);
 
-    User findByEmail(String email);
+    AppUser findByEmail(String email);
 }

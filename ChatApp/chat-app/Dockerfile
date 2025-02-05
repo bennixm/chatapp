@@ -10,6 +10,8 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm install
 RUN npm install axios
+RUN npm install vuex@next
+
 
 # Copy the Vue.js application source code
 COPY . .

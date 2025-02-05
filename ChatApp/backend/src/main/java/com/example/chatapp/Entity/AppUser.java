@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class AppUser {
 
     @Id
     @Column(name = "userid", length = 45)
@@ -21,11 +21,11 @@ public class User {
     private String password;
 
     // Default constructor
-    public User() {
+    public AppUser() {
     }
 
     // Parameterized constructor
-    public User(int userid, String username, String email, String password) {
+    public AppUser(int userid, String username, String email, String password) {
         this.userid = userid;
         this.username = username;
         this.email = email;

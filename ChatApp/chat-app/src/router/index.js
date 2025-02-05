@@ -5,10 +5,10 @@ import RegisterPage from '@/views/Register.vue';
 import LoginPage from '@/views/Login.vue';
 
 const routes = [
-  { path: '/', component: HomePage },
-  { path: '/chatapp', component: ChatPage },
-  { path: '/register', component: RegisterPage },
-  { path: '/login', component: LoginPage }
+  { path: '/', name: 'HomePage', component: HomePage },
+  { path: '/chatapp', name: 'ChatPage', component: ChatPage },
+  { path: '/register', name: 'RegisterPage', component: RegisterPage },
+  { path: '/login', name: 'LoginPage', component: LoginPage }
 ];
 
 const router = createRouter({
