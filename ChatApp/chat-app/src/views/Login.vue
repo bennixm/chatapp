@@ -28,10 +28,9 @@
 </template>
 
 <script>
-import Vue from 'vue';
+
 import axios from 'axios';
 
-Vue.use(axios)
 export default {
   name: 'LoginPage',
   data () {
@@ -49,33 +48,24 @@ export default {
     console.log("mounted() called.......");
   },
   methods: {
-    LoginData()
-    {
-      axios.post("http://localhost:8085/api/v1/user/login", this.user)
-          .then(
-              ({data})=>{
-                console.log(data);
-                try {
-                  if (data.message === "Email not exits")
-                  {
-                    alert("Email not exits");
+    LoginData() {
+      axios.post("http://backend:8085/api/v1/user/login", this.user)
+          .then(({ data }) => {
+            console.log(data);
 
-                  }
-                  else if(data.message == "Login Success")
-                  {
-
-                    this.$router.push({ name: 'HomePage' })
-                  }
-                  else
-                  {
-                    alert("Incorrect Email and Password not match");
-                  }
-
-                } catch (err) {
-                  alert("Error, please try again");
-                }
-              }
-          )
+            // Check for specific response messages
+            if (data.message === "Email not exists") {
+              alert("Email does not exist.");
+            } else if (data.message === "Login Success") {
+              this.$router.push({ name: 'HomePage' });
+            } else {
+              alert("Incorrect Email or Password.");
+            }
+          })
+          .catch(err => {
+            console.error("An error occurred:", err);
+            alert("Error, please try again.");
+          });
     }
   }
 }

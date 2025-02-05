@@ -9,12 +9,13 @@ COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
+RUN npm install axios
 
 # Copy the Vue.js application source code
 COPY . .
 
 # Expose the default port for Vue development server (8080)
-EXPOSE 8080
+EXPOSE 8081
 
 # Run the Vue.js development server
 CMD ["npm", "run", "serve"]

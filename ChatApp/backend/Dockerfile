@@ -30,11 +30,11 @@ WORKDIR /app
 COPY --from=builder /app/target/*.jar /app/app.jar
 
 # Environment variables for the Spring application
-ENV SPRING_SERVER_PORT=8081 \
-    SPRING_APP_NAME=MicroService
+ENV SPRING_SERVER_PORT=8085 \
+    SPRING_APP_NAME=Chatapp
 
 # Expose the application port
-EXPOSE 8081
+EXPOSE 8085
 
 # Wait for MySQL to be available before starting the Spring Boot application
 ENTRYPOINT ["sh", "-c", "dockerize -wait tcp://mysql:3306 -timeout 60s && java -jar /app/app.jar"]
