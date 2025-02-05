@@ -51,6 +51,9 @@ export default {
 
           store.commit('setUsername', response.data.username);
 
+          localStorage.setItem('username', response.data.username);
+
+
           router.push({ name: 'ChatPage' });
         } else {
           alert("Incorrect Email or Password.");
@@ -60,6 +63,7 @@ export default {
         alert("Error, please try again.");
       }
     };
+
 
     return { user, LoginData };
   }

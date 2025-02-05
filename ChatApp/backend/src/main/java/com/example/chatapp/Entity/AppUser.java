@@ -20,11 +20,10 @@ public class AppUser {
     @Column(name = "password", length = 255)
     private String password;
 
-    // Default constructor
+
     public AppUser() {
     }
 
-    // Parameterized constructor
     public AppUser(int userid, String username, String email, String password) {
         this.userid = userid;
         this.username = username;
@@ -32,7 +31,7 @@ public class AppUser {
         this.password = password;
     }
 
-    // Getter and Setter for 'userid'
+
     public int getUserid() {
         return userid;
     }
@@ -41,7 +40,6 @@ public class AppUser {
         this.userid = userid;
     }
 
-    // Getter and Setter for 'username'
     public String getUsername() {
         return username;
     }
@@ -50,7 +48,6 @@ public class AppUser {
         this.username = username;
     }
 
-    // Getter and Setter for 'email'
     public String getEmail() {
         return email;
     }
@@ -59,7 +56,6 @@ public class AppUser {
         this.email = email;
     }
 
-    // Getter and Setter for 'password'
     public String getPassword() {
         return password;
     }

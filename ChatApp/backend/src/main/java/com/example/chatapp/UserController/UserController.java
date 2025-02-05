@@ -3,7 +3,7 @@ package com.example.chatapp.UserController;
 import com.example.chatapp.Dto.LoginDTO;
 import com.example.chatapp.Dto.UserDTO;
 import com.example.chatapp.Service.UserService;
-import com.example.chatapp.Repository.UserRepository; // ✅ Import UserRepository
+import com.example.chatapp.Repository.UserRepository;
 import com.example.chatapp.Entity.AppUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserRepository userRepository;  // ✅ Add this line to inject UserRepository
+    private UserRepository userRepository;
 
-    // Save user
+
     @PostMapping("/save")
     public ResponseEntity<String> saveUser(@RequestBody UserDTO userDTO) {
         try {
@@ -61,14 +61,14 @@ public class UserController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Fetch the authenticated user
-            AppUser user = userRepository.findByEmail(loginDTO.getEmail()); // ✅ Now userRepository is available
+
+            AppUser user = userRepository.findByEmail(loginDTO.getEmail());
 
             if (user != null) {
                 response.put("message", "Login Success");
-                response.put("username", user.getUsername()); // ✅ Send username
-                response.put("email", user.getEmail()); // Optional
-                response.put("userId", String.valueOf(user.getUserid())); // Optional
+                response.put("username", user.getUsername());
+                response.put("email", user.getEmail());
+                response.put("userId", String.valueOf(user.getUserid()));
 
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
@@ -81,11 +81,11 @@ public class UserController {
         }
     }
 
-    // Logout user - handled by Spring Security
+
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {
         try {
-            // Invalidate the session to log the user out
+
             request.getSession().invalidate();
             response.setStatus(HttpServletResponse.SC_OK);
             return new ResponseEntity<>("Logout successful", HttpStatus.OK);
@@ -93,4 +93,5 @@ public class UserController {
             return new ResponseEntity<>("An error occurred during logout", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

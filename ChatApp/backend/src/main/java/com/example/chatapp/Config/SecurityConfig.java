@@ -20,21 +20,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final MyUserDetailsService myUserDetailsService;
-    private final CorsFilter corsFilter;  // Declare both dependencies
+    private final CorsFilter corsFilter;
 
-    // Use one constructor to inject both dependencies
+
     public SecurityConfig(MyUserDetailsService myUserDetailsService, CorsFilter corsFilter) {
         this.myUserDetailsService = myUserDetailsService;
         this.corsFilter = corsFilter;
     }
 
-    // Bean for PasswordEncoder
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Bean for AuthenticationManager
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
@@ -48,10 +48,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)  // Apply CorsFilter before the authentication filter
-                .csrf().disable()  // Disable CSRF if necessary
-                .authorizeRequests()
-                .anyRequest().permitAll();  // Adjust your access control here if needed
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable()
+                .authorizeHttpRequests()
+                .anyRequest().permitAll();
         return http.build();
     }
 

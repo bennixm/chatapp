@@ -22,7 +22,7 @@
         <div class="links">
           <router-link to="/login"> Sign in</router-link>
         </div>
-        <button type="submit" id="submit" class="btn btn-primary">Login</button>
+        <button type="submit" id="submit" class="btn btn-primary">Register</button>
       </form>
     </div>
   </div>
@@ -49,26 +49,25 @@ export default {
   },
   methods: {
     saveData() {
-      // Basic validation
       if (!this.user.username || !this.user.email || !this.user.password) {
         alert("Please fill in all fields.");
-        return; // Don't proceed with the request
+        return;
       }
 
-      // You could add email validation here too if needed:
+
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.user.email)) {
         alert("Please enter a valid email address.");
         return;
       }
 
-      // Password length validation (optional, based on your needs)
+
       if (this.user.password.length < 6) {
         alert("Password must be at least 6 characters long.");
         return;
       }
 
-      // Now make the request
+
       axios
           .post("http://0.0.0.0:8085/api/v1/user/save", this.user)
           .then(({ data }) => {

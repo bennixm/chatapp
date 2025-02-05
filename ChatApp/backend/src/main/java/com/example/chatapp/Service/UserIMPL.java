@@ -27,7 +27,7 @@ public class UserIMPL implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private AuthenticationManager authenticationManager;  // AuthenticationManager to authenticate the user
+    private AuthenticationManager authenticationManager;
 
     @Override
     public String addUser(UserDTO userDTO) {
@@ -44,26 +44,21 @@ public class UserIMPL implements UserService {
 
     @Override
     public LoginMessage loginUser(LoginDTO loginDTO) {
-        // Check if the user exists based on email
+
         AppUser user1 = userRepository.findByEmail(loginDTO.getEmail());
         if (user1 != null) {
             String password = loginDTO.getPassword();
             String encodedPassword = user1.getPassword();
 
-            // Validate if the provided password matches the stored password
             boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
             if (isPwdRight) {
-                // Use AuthenticationManager to authenticate the user
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
 
-                // Authenticate the token
                 Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-                // Set the authentication in SecurityContextHolder to create the session
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // Return success message with status
                 return new LoginMessage("Login Success", true);
             } else {
                 return new LoginMessage("Password Not Match", false);

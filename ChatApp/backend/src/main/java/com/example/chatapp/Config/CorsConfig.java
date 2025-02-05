@@ -14,12 +14,12 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        config.addAllowedOrigin("http://localhost:8081");  // Frontend URL
-        config.addAllowedMethod("*");  // Allow all HTTP methods (GET, POST, etc.)
-        config.addAllowedHeader("*");  // Allow all headers
-        config.setAllowCredentials(true);  // Allow credentials (cookies, etc.)
+        config.addAllowedOrigin("http://localhost:8081");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        config.setAllowCredentials(true);
 
-        source.registerCorsConfiguration("/**", config);  // Apply to all routes
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 }
