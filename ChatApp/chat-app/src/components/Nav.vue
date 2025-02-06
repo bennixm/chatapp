@@ -1,6 +1,12 @@
 <template>
-  <header class="navbar-element">
-    <div class="nav-header user-login">
+  <header class="main-navbar-element">
+    <div class="mini-navbar-element" v-if="username">
+      <div class="mini-nav-item"><router-link to="/find-people"><i class="fa fa-search" aria-hidden="true"></i></router-link></div>
+      <div class="mini-nav-item"><router-link to="/new-chat"><i class="fa fa-plus" aria-hidden="true"></i></router-link></div>
+      <div class="mini-nav-item"><router-link to="/search"><i class="fa fa-cog" aria-hidden="true"></i></router-link></div>
+    </div>
+    <div class="navbar-element">
+      <div :class="['nav-header', 'user-login', { 'header-borderless': !username }]">
       <div class="user-img"></div>
 
 
@@ -11,22 +17,16 @@
 
       <div v-else>
         <div class="user-auth">Welcome, {{ username }}</div>
-        <button @click="logout" class="logout-btn">Logout</button>
       </div>
     </div>
-    <nav class="navbar">
-      <div class="navbar-head-title" v-if="username"><span>Chat</span></div>
-      <div class="links" v-if="username">
-        <ul>
-          <li>
-            <router-link to="/search"><i class="fa fa-users"></i> Find people</router-link>
-          </li>
-          <li>
-            <router-link to="/group-chat"><i class="fa fa-comments"></i> Create Group</router-link>
-          </li>
-        </ul>
-      </div>
+    <nav class="navbar" v-if="username">
+      <div class="navbar-head-title"><span>Chats</span></div>
+
     </nav>
+    <div class="user-logout" v-if="username">
+      <button @click="logout" class="logout-btn">Logout</button>
+    </div>
+    </div>
   </header>
 </template>
 

@@ -1,19 +1,30 @@
 <template>
   <NavComponent/>
-  <div class="content">
+  <div :class="['content', { 'content-logout': !username }]">
   <router-view />
  </div>
 </template>
 
 <script>
 import NavComponent from './components/Nav.vue';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
 
 export default {
   name: 'App',
   components: {
     NavComponent
+  },
+  setup() {
+    const store = useStore();
+    const username = computed(() => store.state.username);
+
+
+    return { username };
   }
 }
+
 </script>
 
 <style>
