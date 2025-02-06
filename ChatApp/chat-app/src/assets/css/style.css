@@ -391,6 +391,11 @@ ul{
     opacity: 0.8;
 }
 .panel{
-    display:flex;
-    justify-content: center
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+}
+.header-borderless{
+    border:none;
 }
