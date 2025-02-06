@@ -20,7 +20,7 @@
           <i></i>
         </div>
         <div class="links">
-          <router-link to="/login"> Sign in</router-link>
+          <router-link to="/login">Sign in</router-link>
         </div>
         <button type="submit" id="submit" class="btn btn-primary">Register</button>
       </form>
@@ -30,12 +30,12 @@
 
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default {
   name: 'RegisterPage',
   data() {
     return {
-      result: {},
       user: {
         username: '',
         email: '',
@@ -43,45 +43,131 @@ export default {
       }
     };
   },
-  created() {},
   mounted() {
-    console.log("mounted() called.......");
+    console.log("RegisterPage mounted...");
   },
   methods: {
-    saveData() {
+    async saveData() {
+
       if (!this.user.username || !this.user.email || !this.user.password) {
-        alert("Please fill in all fields.");
+        Swal.fire({
+          icon: "warning",
+          title: "Missing Fields",
+          text: "Please fill in all fields.",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6"
+        });
         return;
       }
-
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.user.email)) {
-        alert("Please enter a valid email address.");
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Email",
+          text: "Please enter a valid email address.",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6"
+        });
         return;
       }
-
 
       if (this.user.password.length < 6) {
-        alert("Password must be at least 6 characters long.");
+        Swal.fire({
+          icon: "warning",
+          title: "Weak Password",
+          text: "Password must be at least 6 characters long.",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6"
+        });
         return;
       }
 
+      try {
+        const response = await axios.post("http://localhost:8085/api/v1/user/save", this.user);
+        console.log(response.data);
 
-      axios
-          .post("http://localhost:8085/api/v1/user/save", this.user)
-          .then(({ data }) => {
-            console.log(data);
-            alert("User registered successfully");
-          })
-          .catch(error => {
-            console.error("There was an error!", error);
-            alert("Error during registration");
-          });
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+          text: "You can now log in.",
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6"
+        });
+
+        setTimeout(() => {
+          this.$router.push({ path: "/login" });
+        }, 2000);
+
+      } catch (error) {
+        console.error("Registration error:", error);
+
+        if (error.response) {
+          const errorMessage = error.response.data.message;
+
+          if (errorMessage === "Email already exists") {
+            Swal.fire({
+              icon: "error",
+              title: "Email Already Exists",
+              text: "The email you entered is already registered. Please try using a different email.",
+              customClass: {
+                popup: "custom-popup",
+              },
+              background: "#000000e0",
+              color: "#ffffff",
+              confirmButtonColor: "#009ca6"
+            });
+          } else if (errorMessage === "Username already exists") {
+            Swal.fire({
+              icon: "error",
+              title: "Username Already Exists",
+              text: "The username you entered is already taken. Please try using a different username.",
+              customClass: {
+                popup: "custom-popup",
+              },
+              background: "#000000e0",
+              color: "#ffffff",
+              confirmButtonColor: "#009ca6"
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "An error occurred during registration. Please try again.",
+              customClass: {
+                popup: "custom-popup",
+              },
+              background: "#000000e0",
+              color: "#ffffff",
+              confirmButtonColor: "#009ca6"
+            });
+          }
+        }
+      }
     }
   }
 };
 </script>
 
+
 <style scoped>
+/* Add your styles here */
 </style>

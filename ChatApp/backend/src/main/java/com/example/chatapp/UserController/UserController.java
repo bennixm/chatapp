@@ -42,12 +42,19 @@ public class UserController {
     @PostMapping("/save")
     public ResponseEntity<String> saveUser(@RequestBody UserDTO userDTO) {
         try {
-            String username = userService.addUser(userDTO);
-            return new ResponseEntity<>("User " + username + " registered successfully", HttpStatus.CREATED);
+            String result = userService.addUser(userDTO);
+            if ("Email already exists".equals(result)) {
+                return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
+            } else if ("Username already exists".equals(result)) {
+                return new ResponseEntity<>("Username already exists", HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>("User " + result + " registered successfully", HttpStatus.CREATED);
         } catch (Exception e) {
+
             return new ResponseEntity<>("An error occurred while registering the user", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody LoginDTO loginDTO) {

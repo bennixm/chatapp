@@ -399,3 +399,7 @@ ul{
 .header-borderless{
     border:none;
 }
+.custom-popup{
+    border-radius:8px;
+    border:1px solid #009ca6;
+}

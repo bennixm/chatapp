@@ -11,6 +11,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 RUN npm install axios
 RUN npm install vuex@next
+RUN npm install sweetalert2 vue-sweetalert2
 
 
 # Copy the Vue.js application source code
