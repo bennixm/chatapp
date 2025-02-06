@@ -69,7 +69,7 @@ export default {
 
 
       axios
-          .post("http://0.0.0.0:8085/api/v1/user/save", this.user)
+          .post("http://localhost:8085/api/v1/user/save", this.user)
           .then(({ data }) => {
             console.log(data);
             alert("User registered successfully");
