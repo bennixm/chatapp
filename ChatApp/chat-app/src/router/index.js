@@ -4,6 +4,7 @@ import HomePage from '@/views/HomePage.vue';
 import ChatPage from '@/views/ChatPage.vue';
 import RegisterPage from '@/views/Register.vue';
 import LoginPage from '@/views/Login.vue';
+import SettingsPage from '@/views/Settings.vue';
 
 const routes = [
   { path: '/', name: 'HomePage', component: HomePage },
@@ -11,6 +12,20 @@ const routes = [
     path: '/chatapp',
     name: 'ChatPage',
     component: ChatPage,
+    beforeEnter: (to, from, next) => {
+      const store = useStore();
+
+      if (!store.state.username) {
+        next('/login');
+      } else {
+        next();
+      }
+    },
+  },
+  {
+    path: '/settings',
+    name: 'SettingsPage',
+    component: SettingsPage,
     beforeEnter: (to, from, next) => {
       const store = useStore();
 

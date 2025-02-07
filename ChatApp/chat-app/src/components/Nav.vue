@@ -16,12 +16,62 @@
 
 
       <div v-else>
-        <div class="user-auth">Welcome, {{ username }}</div>
+        <div class="user-auth">{{ username }}</div>
       </div>
     </div>
     <nav class="navbar" v-if="username">
       <div class="navbar-head-title"><span>Chats</span></div>
-
+      <div class="chat-items custom-scrollbar">
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+              <div class="user-name">Name</div>
+              <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+          <div class="user-name">Name</div>
+          <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+          <div class="user-name">Name</div>
+          <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+          <div class="user-name">Name</div>
+          <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+          <div class="user-name">Name</div>
+          <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+          <div class="user-name">Name</div>
+          <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-identity"></div>
+        <div class="chat-item-content">
+          <div class="user-name">Name</div>
+          <div class="user-chat">some text some text some text some text</div>
+        </div>
+      </div>
+      </div>
     </nav>
     <div class="user-logout" v-if="username">
       <button @click="logout" class="logout-btn">Logout</button>
