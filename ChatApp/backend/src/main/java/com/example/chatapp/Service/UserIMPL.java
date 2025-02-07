@@ -33,11 +33,13 @@ public class UserIMPL implements UserService {
     public String addUser(UserDTO userDTO) {
 
         AppUser existingEmailUser = userRepository.findByEmail(userDTO.getEmail());
+        AppUser existingUsernameUser = userRepository.findByUsername(userDTO.getUsername());
+        if (existingUsernameUser != null && existingEmailUser != null) {
+            return "We have found an existing user";
+        }
         if (existingEmailUser != null) {
             return "Email already exists";
         }
-
-        AppUser existingUsernameUser = userRepository.findByUsername(userDTO.getUsername());
         if (existingUsernameUser != null) {
             return "Username already exists";
         }

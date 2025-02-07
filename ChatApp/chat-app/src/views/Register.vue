@@ -125,7 +125,7 @@ export default {
 
           if (errorMessage === "Email already exists") {
             Swal.fire({
-              icon: "error",
+              icon: "warning",
               title: "Email Already Exists",
               text: "The email you entered is already registered. Please try using a different email.",
               customClass: {
@@ -137,7 +137,7 @@ export default {
             });
           } else if (errorMessage === "Username already exists") {
             Swal.fire({
-              icon: "error",
+              icon: "warning",
               title: "Username Already Exists",
               text: "The username you entered is already taken. Please try using a different username.",
               customClass: {
@@ -147,7 +147,22 @@ export default {
               color: "#ffffff",
               confirmButtonColor: "#009ca6"
             });
-          } else {
+            } else if (errorMessage === "We have found an existing user") {
+            Swal.fire({
+              icon: "warning",
+              title: "Login",
+              text: "We have found an existing user, try to login.",
+              customClass: {
+                popup: "custom-popup",
+              },
+              background: "#000000e0",
+              color: "#ffffff",
+              confirmButtonColor: "#009ca6"
+            });
+            setTimeout(() => {
+              this.$router.push({ path: "/login" });
+            }, 2000);
+            } else {
             Swal.fire({
               icon: "error",
               title: "Error",

@@ -40,18 +40,27 @@ public class UserController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<String> saveUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Map<String, String>> saveUser(@RequestBody UserDTO userDTO) {
+        Map<String, String> response = new HashMap<>();
         try {
             String result = userService.addUser(userDTO);
-            if ("Email already exists".equals(result)) {
-                return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
-            } else if ("Username already exists".equals(result)) {
-                return new ResponseEntity<>("Username already exists", HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>("User " + result + " registered successfully", HttpStatus.CREATED);
-        } catch (Exception e) {
 
-            return new ResponseEntity<>("An error occurred while registering the user", HttpStatus.INTERNAL_SERVER_ERROR);
+            if ("Email already exists".equals(result)) {
+                response.put("message", "Email already exists");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            } else if ("Username already exists".equals(result)) {
+                response.put("message", "Username already exists");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            } else if ("We have found an existing user".equals(result)) {
+                response.put("message", "We have found an existing user");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            response.put("message", "User " + result + " registered successfully");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            response.put("message", "An error occurred while registering the user");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
