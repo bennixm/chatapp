@@ -47,8 +47,6 @@ export default {
         const response = await axios.post("http://localhost:8085/api/v1/user/login", user);
 
         if (response.data.message === "Login Success") {
-          store.commit('setUsername', response.data.username);
-          localStorage.setItem('username', response.data.username);
 
           Swal.fire({
             icon: "success",
@@ -61,10 +59,13 @@ export default {
             },
             background: "#000000e0",
             color: "#ffffff",
-            confirmButtonColor: "#009ca6"
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
           });
 
           setTimeout(() => {
+            store.commit('setUsername', response.data.username);
+            localStorage.setItem('username', response.data.username);
             router.push({ name: 'ChatPage' });
           }, 2000);
 
@@ -79,7 +80,8 @@ export default {
             },
             background: "#000000e0",
             color: "#ffffff",
-            confirmButtonColor: "#009ca6"
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
           });
         }
 
@@ -97,7 +99,8 @@ export default {
             },
             background: "#000000e0",
             color: "#ffffff",
-            confirmButtonColor: "#009ca6"
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
           });
 
         } else if (error.response && error.response.status === 500) {
@@ -111,7 +114,8 @@ export default {
             },
             background: "#000000e0",
             color: "#ffffff",
-            confirmButtonColor: "#009ca6"
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
           });
 
         } else if (error.response && error.response.status === 404) {
@@ -125,7 +129,8 @@ export default {
             },
             background: "#000000e0",
             color: "#ffffff",
-            confirmButtonColor: "#009ca6"
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
           });
         } else {
 
@@ -139,7 +144,8 @@ export default {
             },
             background: "#000000e0",
             color: "#ffffff",
-            confirmButtonColor: "#009ca6"
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
           });
         }
       }

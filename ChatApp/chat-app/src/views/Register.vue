@@ -59,7 +59,8 @@ export default {
           },
           background: "#000000e0",
           color: "#ffffff",
-          confirmButtonColor: "#009ca6"
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
         return;
       }
@@ -75,7 +76,8 @@ export default {
           },
           background: "#000000e0",
           color: "#ffffff",
-          confirmButtonColor: "#009ca6"
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
         return;
       }
@@ -90,7 +92,8 @@ export default {
           },
           background: "#000000e0",
           color: "#ffffff",
-          confirmButtonColor: "#009ca6"
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
         return;
       }
@@ -110,7 +113,8 @@ export default {
           },
           background: "#000000e0",
           color: "#ffffff",
-          confirmButtonColor: "#009ca6"
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
 
         setTimeout(() => {
@@ -133,7 +137,8 @@ export default {
               },
               background: "#000000e0",
               color: "#ffffff",
-              confirmButtonColor: "#009ca6"
+              confirmButtonColor: "#009ca6",
+              heightAuto:false
             });
           } else if (errorMessage === "Username already exists") {
             Swal.fire({
@@ -145,7 +150,8 @@ export default {
               },
               background: "#000000e0",
               color: "#ffffff",
-              confirmButtonColor: "#009ca6"
+              confirmButtonColor: "#009ca6",
+              heightAuto:false
             });
             } else if (errorMessage === "We have found an existing user") {
             Swal.fire({
@@ -157,7 +163,8 @@ export default {
               },
               background: "#000000e0",
               color: "#ffffff",
-              confirmButtonColor: "#009ca6"
+              confirmButtonColor: "#009ca6",
+              heightAuto:false
             });
             setTimeout(() => {
               this.$router.push({ path: "/login" });
@@ -172,7 +179,8 @@ export default {
               },
               background: "#000000e0",
               color: "#ffffff",
-              confirmButtonColor: "#009ca6"
+              confirmButtonColor: "#009ca6",
+              heightAuto:false
             });
           }
         }
