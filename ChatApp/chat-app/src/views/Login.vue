@@ -46,7 +46,7 @@ export default {
       try {
         const response = await axios.post("http://localhost:8085/api/v1/user/login", user);
 
-        if (response.data.message === "Login Success") {
+        if (response.data.username) {
 
           Swal.fire({
             icon: "success",
@@ -65,7 +65,7 @@ export default {
 
           setTimeout(() => {
             store.commit('setUsername', response.data.username);
-            localStorage.setItem('username', response.data.username);
+            store.commit('setUserId', response.data.userId);
             router.push({ name: 'ChatPage' });
           }, 2000);
 

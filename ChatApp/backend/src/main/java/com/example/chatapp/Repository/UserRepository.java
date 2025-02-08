@@ -1,7 +1,6 @@
 package com.example.chatapp.Repository;
 
 import com.example.chatapp.Entity.AppUser;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;

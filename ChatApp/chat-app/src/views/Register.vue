@@ -126,63 +126,43 @@ export default {
 
         if (error.response) {
           const errorMessage = error.response.data.message;
+          let title = "Error";
+          let text = "An error occurred during registration. Please try again.";
+          let icon = "error";
 
-          if (errorMessage === "Email already exists") {
-            Swal.fire({
-              icon: "warning",
-              title: "Email Already Exists",
-              text: "The email you entered is already registered. Please try using a different email.",
-              customClass: {
-                popup: "custom-popup",
-              },
-              background: "#000000e0",
-              color: "#ffffff",
-              confirmButtonColor: "#009ca6",
-              heightAuto:false
-            });
-          } else if (errorMessage === "Username already exists") {
-            Swal.fire({
-              icon: "warning",
-              title: "Username Already Exists",
-              text: "The username you entered is already taken. Please try using a different username.",
-              customClass: {
-                popup: "custom-popup",
-              },
-              background: "#000000e0",
-              color: "#ffffff",
-              confirmButtonColor: "#009ca6",
-              heightAuto:false
-            });
-            } else if (errorMessage === "We have found an existing user") {
-            Swal.fire({
-              icon: "warning",
-              title: "Login",
-              text: "We have found an existing user, try to login.",
-              customClass: {
-                popup: "custom-popup",
-              },
-              background: "#000000e0",
-              color: "#ffffff",
-              confirmButtonColor: "#009ca6",
-              heightAuto:false
-            });
-            setTimeout(() => {
-              this.$router.push({ path: "/login" });
-            }, 2000);
-            } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "An error occurred during registration. Please try again.",
-              customClass: {
-                popup: "custom-popup",
-              },
-              background: "#000000e0",
-              color: "#ffffff",
-              confirmButtonColor: "#009ca6",
-              heightAuto:false
-            });
+          switch (errorMessage) {
+            case "Email already exists":
+              title = "Email Already Exists";
+              text = "The email you entered is already registered. Please try using a different email.";
+              icon = "warning";
+              break;
+            case "Username already exists":
+              title = "Username Already Exists";
+              text = "The username you entered is already taken. Please try using a different username.";
+              icon = "warning";
+              break;
+            case "We have found an existing user":
+              title = "Login";
+              text = "We have found an existing user. Try to log in.";
+              icon = "info";
+              setTimeout(() => {
+                this.$router.push({ path: "/login" });
+              }, 2000);
+              break;
+            default:
+              break;
           }
+
+          Swal.fire({
+            icon: icon,
+            title: title,
+            text: text,
+            customClass: { popup: "custom-popup" },
+            background: "#000000e0",
+            color: "#ffffff",
+            confirmButtonColor: "#009ca6",
+            heightAuto: false,
+          });
         }
       }
     }

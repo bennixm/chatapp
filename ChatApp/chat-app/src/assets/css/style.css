@@ -545,3 +545,70 @@ ul{
     background-position:center;
     background-repeat:no-repeat;
 }
+.search-section{
+    width:100%;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.search-section-content{
+    width:65%;
+    display:flex;
+    flex-direction: column;
+}
+.search-section-content .feedback-request{
+    text-align: center;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    width:100%;
+}
+.search-nav{
+    width:30%;
+}
+.display-user-item{
+    width:90%;
+    padding:10px;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.display-user-item .user-item-identity{
+    width:28%;
+    border-radius:10px;
+    height:40px;
+    background-color:white;
+}
+.display-user-item .user-item-content{
+    width:47%;
+    display:flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.display-user-item .user-item-content .username{
+    font-size:17px;
+    color:white;
+    font-weight:bold;
+}
+.display-user-item .user-item-content email{
+    font-size:14px;
+    color:white;
+    text-align: left;
+}
+.display-user-item .user-item-buttons{
+    width:20%;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.display-user-item .user-item-buttons a{
+    color:white;
+    font-weight: bold;
+    padding:5px;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    border: 1px solid #ffffff21;
+    margin-right:5px;
+}

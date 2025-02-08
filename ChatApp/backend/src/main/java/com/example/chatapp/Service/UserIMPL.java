@@ -6,6 +6,7 @@ import com.example.chatapp.Entity.AppUser;
 import com.example.chatapp.Repository.UserRepository;
 import com.example.chatapp.Service.UserService;
 import com.example.chatapp.payload.response.LoginMessage;
+import com.example.chatapp.payload.response.UserResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,18 +31,19 @@ public class UserIMPL implements UserService {
     private AuthenticationManager authenticationManager;
 
     @Override
-    public String addUser(UserDTO userDTO) {
+    public UserResult addUser(UserDTO userDTO) {
 
         AppUser existingEmailUser = userRepository.findByEmail(userDTO.getEmail());
         AppUser existingUsernameUser = userRepository.findByUsername(userDTO.getUsername());
+
         if (existingUsernameUser != null && existingEmailUser != null) {
-            return "We have found an existing user";
+            return new UserResult.Failure("We have found an existing user");
         }
         if (existingEmailUser != null) {
-            return "Email already exists";
+            return new UserResult.Failure("Email already exists");
         }
         if (existingUsernameUser != null) {
-            return "Username already exists";
+            return new UserResult.Failure("Username already exists");
         }
 
         AppUser user = new AppUser(
@@ -52,11 +54,11 @@ public class UserIMPL implements UserService {
         );
 
         userRepository.save(user);
-        return user.getUsername();
+        return new UserResult.Success(user.getUsername());
     }
 
     @Override
-    public LoginMessage loginUser(LoginDTO loginDTO) {
+    public UserResult loginUser(LoginDTO loginDTO) {
 
         AppUser user1 = userRepository.findByEmail(loginDTO.getEmail());
         if (user1 != null) {
@@ -65,19 +67,12 @@ public class UserIMPL implements UserService {
 
             boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
             if (isPwdRight) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
-
-                Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                return new LoginMessage("Login Success", true);
+                return new UserResult.Success(user1.getUsername());
             } else {
-                return new LoginMessage("Password Not Match", false);
+                return new UserResult.Failure("Password Not Match");
             }
         } else {
-            return new LoginMessage("Email not found", false);
+            return new UserResult.Failure("Email not found");
         }
     }
 }
