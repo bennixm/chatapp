@@ -78,6 +78,7 @@ public class UserController {
             if (result instanceof UserResult.Success s) {
                 response.put("message", "Login Success");
                 response.put("username", s.username());
+                response.put("userId", String.valueOf(s.userId()));
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else if (result instanceof UserResult.Failure f) {
                 response.put("message", f.message());

@@ -612,3 +612,53 @@ ul{
     border: 1px solid #ffffff21;
     margin-right:5px;
 }
+.user-item-buttons button {
+    padding: 8px 16px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-send-request {
+    background-color: rgba(40, 167, 69, 0.8);
+    color: white;
+}
+
+.btn-send-request:hover {
+    background-color: rgba(33, 136, 56, 0.93);
+}
+
+.btn-accept {
+    background-color: rgba(0, 123, 255, 0.79);
+    color: white;
+}
+
+.btn-accept:hover {
+    background-color: rgba(0, 86, 179, 0.93);
+}
+
+.btn-reject {
+    background-color: rgba(220, 53, 69, 0.63);
+    color: white;
+}
+
+.btn-reject:hover {
+    background-color: rgba(200, 35, 51, 0.89);
+}
+
+.btn-disabled {
+    background-color: rgba(108, 117, 125, 0.87);
+    color: rgb(255, 255, 255);
+    cursor: not-allowed;
+}
+
+.search-section-content {
+    margin-top: 20px;
+}
+
+.search-nav {
+    text-align: center;
+    padding: 10px;
+}

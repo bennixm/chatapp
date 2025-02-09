@@ -46,7 +46,7 @@ export default {
       try {
         const response = await axios.post("http://localhost:8085/api/v1/user/login", user);
 
-        if (response.data.username) {
+        if (response.data.username && response.data.userId) {
 
           Swal.fire({
             icon: "success",

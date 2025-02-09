@@ -3,6 +3,7 @@ package com.example.chatapp.Service;
 import com.example.chatapp.Dto.UserDTO;
 import com.example.chatapp.Dto.LoginDTO;
 import com.example.chatapp.Entity.AppUser;
+import com.example.chatapp.Entity.FriendRequest;
 import com.example.chatapp.Repository.UserRepository;
 import com.example.chatapp.Service.UserService;
 import com.example.chatapp.payload.response.LoginMessage;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.HashSet;
+
 
 @Service
 public class UserIMPL implements UserService {
@@ -50,16 +53,18 @@ public class UserIMPL implements UserService {
                 userDTO.getUserid(),
                 userDTO.getUsername(),
                 userDTO.getEmail(),
-                this.passwordEncoder.encode(userDTO.getPassword())
+                this.passwordEncoder.encode(userDTO.getPassword()),
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashSet<>()
         );
 
         userRepository.save(user);
-        return new UserResult.Success(user.getUsername());
+        return new UserResult.Success(user.getUsername(), user.getUserid());
     }
 
     @Override
     public UserResult loginUser(LoginDTO loginDTO) {
-
         AppUser user1 = userRepository.findByEmail(loginDTO.getEmail());
         if (user1 != null) {
             String password = loginDTO.getPassword();
@@ -67,7 +72,7 @@ public class UserIMPL implements UserService {
 
             boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
             if (isPwdRight) {
-                return new UserResult.Success(user1.getUsername());
+                return new UserResult.Success(user1.getUsername(), user1.getUserid());
             } else {
                 return new UserResult.Failure("Password Not Match");
             }
@@ -75,4 +80,5 @@ public class UserIMPL implements UserService {
             return new UserResult.Failure("Email not found");
         }
     }
+
 }

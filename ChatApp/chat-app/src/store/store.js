@@ -3,7 +3,7 @@ import { createStore } from 'vuex';
 export default createStore({
     state: {
         username: localStorage.getItem('username') || null,
-        userId: localStorage.getItem('userId') || null
+        userId: localStorage.getItem('userId') || '',
     },
     mutations: {
         setUsername(state, username) {
@@ -16,7 +16,7 @@ export default createStore({
         },
         clearUsername(state) {
             state.username = null;
-            state.userId = null;
+            state.userId = '';
             localStorage.removeItem('username');
             localStorage.removeItem('userId');
         }
