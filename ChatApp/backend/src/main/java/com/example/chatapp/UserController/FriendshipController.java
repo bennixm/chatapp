@@ -1,16 +1,25 @@
-package com.example.chatapp.controller;
+package com.example.chatapp.UserController;
 
+import com.example.chatapp.Dto.FriendRequestDTO;
 import com.example.chatapp.Entity.AppUser;
-import com.example.chatapp.Entity.FriendRequest;
-import com.example.chatapp.payload.response.FriendshipResult;
+import com.example.chatapp.Entity.Friendship;
+
+import com.example.chatapp.Service.FriendshipService;
+
+import com.example.chatapp.Repository.FriendshipRepository;
 import com.example.chatapp.Repository.UserRepository;
-import com.example.chatapp.Repository.FriendRequestRepository;
+import com.example.chatapp.payload.response.FriendshipResult;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+
 
 @RestController
 @RequestMapping("/api/friendship")
@@ -20,112 +29,41 @@ public class FriendshipController {
     private UserRepository userRepository;
 
     @Autowired
-    private FriendRequestRepository friendRequestRepository;
+    private FriendshipRepository friendshipRepository;
+
+    @Autowired
+    private FriendshipService friendshipService;
 
     @PostMapping("/send")
-    public ResponseEntity<FriendshipResult> sendFriendRequest(@RequestParam int senderId, @RequestParam int receiverId) {
-        Optional<AppUser> senderOpt = userRepository.findById(senderId);
-        Optional<AppUser> receiverOpt = userRepository.findById(receiverId);
+    public ResponseEntity<FriendshipResult> sendFriendshipRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
 
-        if (senderOpt.isEmpty() || receiverOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("Invalid sender or receiver."));
+        AppUser sender = userRepository.findById(friendRequestDTO.getSenderUserid()).orElse(null);
+        AppUser receiver = userRepository.findById(friendRequestDTO.getReceiverUserid()).orElse(null);
+
+        if (sender == null || receiver == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new FriendshipResult.Failure("User not found"));
         }
 
-        AppUser sender = senderOpt.get();
-        AppUser receiver = receiverOpt.get();
+        FriendshipResult result = friendshipService.sendFriendshipRequest(sender, receiver);
 
-        if (sender.getUserid() == receiver.getUserid()) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("You cannot send a friend request to yourself."));
-        }
-
-        if (sender.isFriend(receiver)) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("You are already friends."));
-        }
-
-        FriendRequest existingRequest = friendRequestRepository.findBySenderAndReceiver(sender, receiver);
-        if (existingRequest != null && !existingRequest.isAccepted()) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("Friend request already sent."));
-        }
-
-        FriendRequest friendRequest = new FriendRequest(sender, receiver);
-        friendRequestRepository.save(friendRequest);
-
-        return ResponseEntity.ok(new FriendshipResult.Success("Friend request sent successfully."));
+        return result instanceof FriendshipResult.Success success
+                ? ResponseEntity.ok(success)
+                : ResponseEntity.badRequest().body((FriendshipResult.Failure) result);
     }
 
-    @PostMapping("/accept")
-    public ResponseEntity<FriendshipResult> acceptFriendRequest(@RequestParam Long requestId) {
-        Optional<FriendRequest> friendRequestOpt = friendRequestRepository.findById(requestId);
-
-        if (friendRequestOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("Friend request not found."));
-        }
-
-        FriendRequest friendRequest = friendRequestOpt.get();
-        if (friendRequest.isAccepted()) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("Friend request already accepted."));
-        }
-
-        friendRequest.setAccepted(true);
-        friendRequestRepository.save(friendRequest);
-
-        AppUser sender = friendRequest.getSender();
-        AppUser receiver = friendRequest.getReceiver();
-        sender.getFriends().add(receiver);
-        receiver.getFriends().add(sender);
-
-        userRepository.save(sender);
-        userRepository.save(receiver);
-
-        return ResponseEntity.ok(new FriendshipResult.Success("Friend request accepted successfully."));
-    }
-
-    @PostMapping("/reject")
-    public ResponseEntity<FriendshipResult> rejectFriendRequest(@RequestParam Long requestId) {
-        Optional<FriendRequest> friendRequestOpt = friendRequestRepository.findById(requestId);
-
-        if (friendRequestOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new FriendshipResult.Failure("Friend request not found."));
-        }
-
-        friendRequestRepository.delete(friendRequestOpt.get());
-
-        return ResponseEntity.ok(new FriendshipResult.Success("Friend request rejected successfully."));
-    }
-
-    @GetMapping("/friends")
-    public ResponseEntity<List<AppUser>> getFriends(@RequestParam int userId) {
+    @GetMapping("/getfriends")
+    public ResponseEntity<List<AppUser>> getFriends(@RequestParam Long userId) {
         Optional<AppUser> userOpt = userRepository.findById(userId);
 
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         AppUser user = userOpt.get();
-        return ResponseEntity.ok(List.copyOf(user.getFriends()));
-    }
 
-    @GetMapping("/received-requests")
-    public ResponseEntity<List<FriendRequest>> getReceivedRequests(@RequestParam int userId) {
-        Optional<AppUser> userOpt = userRepository.findById(userId);
+        List<AppUser> friends = friendshipService.getFriends(user);
 
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        AppUser user = userOpt.get();
-        return ResponseEntity.ok(List.copyOf(user.getReceivedRequests()));
-    }
-
-    @GetMapping("/sent-requests")
-    public ResponseEntity<List<FriendRequest>> getSentRequests(@RequestParam int userId) {
-        Optional<AppUser> userOpt = userRepository.findById(userId);
-
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        AppUser user = userOpt.get();
-        return ResponseEntity.ok(List.copyOf(user.getSentRequests()));
+        return ResponseEntity.ok(friends);
     }
 }
+

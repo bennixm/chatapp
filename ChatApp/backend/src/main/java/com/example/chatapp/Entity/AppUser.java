@@ -18,7 +18,7 @@ public class AppUser {
     @Id
     @Column(name = "userid", length = 45)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int userid;
+    private Long userid;
 
     @Column(name = "username", length = 255)
     private String username;
@@ -29,20 +29,19 @@ public class AppUser {
     @Column(name = "password", length = 255)
     private String password;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_friends",
-            joinColumns = @JoinColumn(name = "userid"),
-            inverseJoinColumns = @JoinColumn(name = "friendid"))
-    private Set<AppUser> friends = new HashSet<>();
 
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
-    private Set<FriendRequest> sentRequests = new HashSet<>();
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
-    private Set<FriendRequest> receivedRequests = new HashSet<>();
-
-    public boolean isFriend(AppUser user) {
-        return friends.contains(user);
+        AppUser appUser = (AppUser) object;
+        return userid == appUser.userid;
     }
+
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (userid != null ? userid.hashCode() : 0);
+        return result;
+    }
+
 }

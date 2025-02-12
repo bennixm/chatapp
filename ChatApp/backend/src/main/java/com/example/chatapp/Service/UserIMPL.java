@@ -3,7 +3,7 @@ package com.example.chatapp.Service;
 import com.example.chatapp.Dto.UserDTO;
 import com.example.chatapp.Dto.LoginDTO;
 import com.example.chatapp.Entity.AppUser;
-import com.example.chatapp.Entity.FriendRequest;
+
 import com.example.chatapp.Repository.UserRepository;
 import com.example.chatapp.Service.UserService;
 import com.example.chatapp.payload.response.LoginMessage;
@@ -53,10 +53,7 @@ public class UserIMPL implements UserService {
                 userDTO.getUserid(),
                 userDTO.getUsername(),
                 userDTO.getEmail(),
-                this.passwordEncoder.encode(userDTO.getPassword()),
-                new HashSet<>(),
-                new HashSet<>(),
-                new HashSet<>()
+                this.passwordEncoder.encode(userDTO.getPassword())
         );
 
         userRepository.save(user);

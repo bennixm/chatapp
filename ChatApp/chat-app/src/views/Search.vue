@@ -38,64 +38,92 @@
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
+import Swal from "sweetalert2";
 
 export default {
   name: "SearchPage",
   data() {
     return {
       users: [],
+      allUsers: [],
+      friends: [],
     };
   },
   computed: {
     ...mapGetters(["getUserId"]),
   },
   created() {
-    this.fetchUsers();
+    this.fetchUsersAndFriends();
   },
   methods: {
-    async fetchUsers() {
+    async fetchUsersAndFriends() {
       try {
-        const response = await axios.get(
+        const allUsersResponse = await axios.get(
             "http://localhost:8085/api/v1/user/allusers"
         );
-        const allUsers = response.data;
-        console.log("Current user ID:", this.getUserId);
-        this.users = allUsers.filter(
-            (user) => user.userid !== parseInt(this.getUserId)
+        this.allUsers = allUsersResponse.data;
+
+        await this.getUserFriends(this.getUserId);
+
+        this.users = this.allUsers.filter(
+            (user) => !this.isFriend(user.userid)
         );
       } catch (error) {
-        console.error("There was an error fetching the users:", error);
+        console.error("There was an error fetching the users and friends:", error);
       }
     },
+
+    async getUserFriends(userId) {
+      try {
+        const response = await axios.get("http://localhost:8085/api/friendship/getfriends", {
+          params: { userId: userId },
+        });
+        this.friends = response.data;
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    },
+
+    isFriend(userid) {
+      return this.friends.some((friend) => friend.userid === userid);
+    },
+
     async sendFriendRequest(receiverId) {
       try {
         const senderId = parseInt(this.getUserId);
         const response = await axios.post(
-            `http://localhost:8085/api/friendship/send?senderId=${senderId}&receiverId=${receiverId}`
+            'http://localhost:8085/api/friendship/send',
+            {
+              senderUserid: senderId,
+              receiverUserid: receiverId,
+            }
         );
-        alert(response.data.message);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Friend Request Sent!',
+          text: response.data.message,
+        });
+
+        this.fetchUsersAndFriends();
       } catch (error) {
         console.error("Error sending friend request:", error);
-        alert("Error sending friend request.");
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'Error sending friend request.',
+        });
       }
     },
-    isFriend(userid) {
 
-      const friends = this.getUserFriends();
-      return friends.some((friend) => friend.userid === userid);
-    },
     startChat(userid) {
-
       this.$router.push({ name: "Chat", params: { userId: userid } });
-    },
-    getUserFriends() {
-
-      return [];
     },
   },
 };
 </script>
 
 <style scoped>
-/* Add any custom styles here */
+/* Add your styles here */
 </style>
