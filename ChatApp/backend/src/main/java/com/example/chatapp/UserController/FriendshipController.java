@@ -5,6 +5,7 @@ import com.example.chatapp.Entity.AppUser;
 import com.example.chatapp.Entity.Friendship;
 
 import com.example.chatapp.Service.FriendshipService;
+import com.example.chatapp.Dto.FriendRequestInfoDTO;
 
 import com.example.chatapp.Repository.FriendshipRepository;
 import com.example.chatapp.Repository.UserRepository;
@@ -65,5 +66,24 @@ public class FriendshipController {
 
         return ResponseEntity.ok(friends);
     }
+
+    @GetMapping("/getFriendRequests")
+    public ResponseEntity<List<FriendRequestInfoDTO>> getPendingFriendRequests(@RequestParam Long userId) {
+        Optional<AppUser> userOpt = userRepository.findById(userId);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        List<FriendRequestInfoDTO> pendingRequests = friendshipService.getPendingFriendRequestsForUser(userId);
+
+        if (pendingRequests.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(pendingRequests);
+        }
+
+        return ResponseEntity.ok(pendingRequests);
+    }
+
+
 }
 

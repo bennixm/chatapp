@@ -30,6 +30,10 @@ public class Friendship {
     @JoinColumn(name = "user2_id", referencedColumnName = "userid", nullable = false)
     private AppUser user2;
 
+    @ManyToOne
+    @JoinColumn(name = "requested_by", referencedColumnName = "userid", nullable = false)
+    private AppUser requestedBy;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -37,9 +41,10 @@ public class Friendship {
     @Column(name = "status", nullable = false)
     private boolean status;
 
-    public Friendship(AppUser user1, AppUser user2, boolean status) {
+    public Friendship(AppUser user1, AppUser user2, AppUser requestedBy, boolean status) {
         this.user1 = user1;
         this.user2 = user2;
+        this.requestedBy = requestedBy;
         this.status = status;
     }
 }

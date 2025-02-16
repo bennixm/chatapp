@@ -8,5 +8,6 @@ import lombok.Data;
 public class FriendRequestDTO {
     private Long senderUserid;
     private Long receiverUserid;
+    private Long requesterUserId;
     private boolean status = false;
 }

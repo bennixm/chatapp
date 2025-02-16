@@ -4,7 +4,7 @@
       <span class="title-page">Find people</span>
     </div>
     <div class="content-page">
-      <div class="search-section">
+      <div class="search-section" v-if="!loading">
         <div class="search-section-content" v-if="users.length">
           <div class="display-user-item" v-for="user in users" :key="user.userid">
             <div class="user-item-identity"></div>
@@ -15,13 +15,8 @@
             <div class="user-item-buttons">
               <button
                   v-if="!isFriend(user.userid)"
-                  @click="sendFriendRequest(user.userid)">
-                <i class="fa fa-user-plus" aria-hidden="true"></i> Add Friend
-              </button>
-              <button
-                  v-if="isFriend(user.userid)"
-                  @click="startChat(user.userid)">
-                <i class="fa fa-comments" aria-hidden="true"></i> Chat
+                  @click="sendFriendRequest(user.userid)" class="send-request-button">
+                <i class="fa fa-user-plus" aria-hidden="true"></i> Add
               </button>
             </div>
           </div>
@@ -39,14 +34,19 @@
 import axios from "axios";
 import { mapGetters } from "vuex";
 import Swal from "sweetalert2";
+import { useRouter } from 'vue-router';
 
 export default {
   name: "SearchPage",
+  setup(){
+    const router = useRouter();
+  },
   data() {
     return {
       users: [],
       allUsers: [],
       friends: [],
+      loading: true,
     };
   },
   computed: {
@@ -65,14 +65,19 @@ export default {
 
         await this.getUserFriends(this.getUserId);
 
-        this.users = this.allUsers.filter(
-            (user) => !this.isFriend(user.userid)
-        );
-      } catch (error) {
-        console.error("There was an error fetching the users and friends:", error);
-      }
-    },
+        this.users = this.allUsers.filter((user) => {
+          const isCurrentUser = user.userid === parseInt(this.getUserId);
+          const isFriend = this.isFriend(user.userid);
 
+          return !isCurrentUser && !isFriend;
+        });
+
+      } catch (error) {
+        console.error("There was an error fetching the users:", error);
+      } finally {
+      this.loading = false;
+    }
+    },
     async getUserFriends(userId) {
       try {
         const response = await axios.get("http://localhost:8085/api/friendship/getfriends", {
@@ -83,11 +88,9 @@ export default {
         console.error("Error fetching friends:", error);
       }
     },
-
     isFriend(userid) {
       return this.friends.some((friend) => friend.userid === userid);
     },
-
     async sendFriendRequest(receiverId) {
       try {
         const senderId = parseInt(this.getUserId);
@@ -103,27 +106,47 @@ export default {
           icon: 'success',
           title: 'Friend Request Sent!',
           text: response.data.message,
-        });
 
-        this.fetchUsersAndFriends();
-      } catch (error) {
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto: false
+        });
+        if (response.data.message === "You have accepted the friend request!") {
+          setTimeout(() => {
+            router.push({ name: 'NewChat' });
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            this.fetchUsersAndFriends();
+          }, 2000);
+        }
+
+      }  catch (error) {
         console.error("Error sending friend request:", error);
+
+        const errorMessage = error.response?.data?.errorMessage || 'Error sending friend request.';
 
         Swal.fire({
           icon: 'error',
           title: 'Error!',
-          text: 'Error sending friend request.',
+          text: errorMessage,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
       }
-    },
-
-    startChat(userid) {
-      this.$router.push({ name: "Chat", params: { userId: userid } });
-    },
+    }
   },
 };
 </script>
 
-<style scoped>
-/* Add your styles here */
-</style>

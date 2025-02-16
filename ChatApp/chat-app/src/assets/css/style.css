@@ -420,8 +420,11 @@ ul{
     flex-direction: row;
     margin-bottom: 10px;
     transition:all .5s;
-    border-radius:10px;
     cursor:pointer;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    border: 1px solid #ffffff21;
+    color:white;
 }
 .chat-item-identity{
     width:30%;
@@ -453,7 +456,7 @@ ul{
     white-space: nowrap;
 }
 .chat-item:hover{
-    background-color: #00f5d424;
+    background-color: rgba(0, 0, 0, 0.22);
 }
 .chat-items{
     width:98%;
@@ -556,6 +559,11 @@ ul{
     display:flex;
     flex-direction: column;
 }
+.notification-section-content{
+    width:100%;
+    display:flex;
+    flex-direction: column;
+}
 .search-section-content .feedback-request{
     text-align: center;
     color:white;
@@ -572,19 +580,23 @@ ul{
     display:flex;
     flex-direction: row;
     justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    border: 1px solid #ffffff21;
+    color: white;
 }
 .display-user-item .user-item-identity{
-    width:28%;
+    width:18%;
     border-radius:10px;
     height:40px;
-    background-color:white;
 }
 .display-user-item .user-item-content{
-    width:47%;
+    width:44%;
+    padding-left:3%;
     display:flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 .display-user-item .user-item-content .username{
     font-size:17px;
@@ -597,7 +609,6 @@ ul{
     text-align: left;
 }
 .display-user-item .user-item-buttons{
-    width:20%;
     display:flex;
     flex-direction: row;
     align-items: center;
@@ -615,45 +626,20 @@ ul{
 .user-item-buttons button {
     padding: 8px 16px;
     margin: 5px;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.3s ease;
+    transition: all .5s;
+    background-color:transparent;
+    border:none;
 }
-
-.btn-send-request {
-    background-color: rgba(40, 167, 69, 0.8);
-    color: white;
+.send-request-button{
+    color:white;
+    background-color: rgba(0, 156, 166, 0.2);
 }
-
-.btn-send-request:hover {
-    background-color: rgba(33, 136, 56, 0.93);
+.send-request-button:hover{
+    background-color: rgba(0, 156, 166, 0.4);
 }
-
-.btn-accept {
-    background-color: rgba(0, 123, 255, 0.79);
-    color: white;
-}
-
-.btn-accept:hover {
-    background-color: rgba(0, 86, 179, 0.93);
-}
-
-.btn-reject {
-    background-color: rgba(220, 53, 69, 0.63);
-    color: white;
-}
-
-.btn-reject:hover {
-    background-color: rgba(200, 35, 51, 0.89);
-}
-
-.btn-disabled {
-    background-color: rgba(108, 117, 125, 0.87);
-    color: rgb(255, 255, 255);
-    cursor: not-allowed;
-}
-
 .search-section-content {
     margin-top: 20px;
 }
@@ -661,4 +647,128 @@ ul{
 .search-nav {
     text-align: center;
     padding: 10px;
+}
+.notification-button{
+    padding:5px;
+    color:white;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    border: 1px solid #ffffff21;
+    transition:all .5s;
+    margin-left: 5px;
+}
+.notification-button:hover{
+    background-color: rgba(0, 0, 0, 0.22);
+}
+
+.friend-requests-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.friend-request-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: rgba(0, 0, 0, .55);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    border: 1px solid #ffffff21;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal h2 {
+    margin-bottom: 15px;
+}
+
+.modal ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.modal ul li {
+    margin: 5px 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background-color: #ccc;
+}
+
+.accept-button {
+    background-color:#45f3ff;
+    color: white;
+}
+.header-users-notify-name{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.has-requests{
+    background-color: rgb(255 0 0 / 12%);
+    animation: bounce 1s ease infinite;
+    position:relative;
+}
+.has-requests i{
+    color: #ff0000;
+}
+.nr-notifications{
+    position: absolute;
+    right: -5px;
+    top: -10px;
+    font-size: 13px;
+    background-color: #000000;
+    border-radius: 50%;
+    width: 15px;
+    heght: 10px;
+    height: 15px;
+    color: red;
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+.chat-items a{
+    text-decoration: none;
 }

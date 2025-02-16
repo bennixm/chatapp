@@ -6,6 +6,7 @@ import RegisterPage from '@/views/Register.vue';
 import LoginPage from '@/views/Login.vue';
 import SettingsPage from '@/views/Settings.vue';
 import SearchPage from '@/views/Search.vue';
+import NewChat from '@/views/NewChat.vue';
 
 const routes = [
   { path: '/', name: 'HomePage', component: HomePage },
@@ -36,6 +37,20 @@ const routes = [
          next();
           }
       },
+  },
+  {
+    path: '/new-chat',
+    name: 'NewChat',
+    component: NewChat,
+    beforeEnter: (to, from, next) => {
+      const store = useStore();
+
+      if (!store.state.username) {
+        next('/login');
+      } else {
+        next();
+      }
+    },
   },
   {
     path: '/settings',
