@@ -6,6 +6,7 @@ import com.example.chatapp.Entity.Friendship;
 
 import com.example.chatapp.Service.FriendshipService;
 import com.example.chatapp.Dto.FriendRequestInfoDTO;
+import com.example.chatapp.Dto.FriendshipRequestStatusDTO;
 
 import com.example.chatapp.Repository.FriendshipRepository;
 import com.example.chatapp.Repository.UserRepository;
@@ -37,16 +38,12 @@ public class FriendshipController {
 
     @PostMapping("/send")
     public ResponseEntity<FriendshipResult> sendFriendshipRequest(@RequestBody FriendRequestDTO friendRequestDTO) {
-
         AppUser sender = userRepository.findById(friendRequestDTO.getSenderUserid()).orElse(null);
         AppUser receiver = userRepository.findById(friendRequestDTO.getReceiverUserid()).orElse(null);
-
         if (sender == null || receiver == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new FriendshipResult.Failure("User not found"));
         }
-
         FriendshipResult result = friendshipService.sendFriendshipRequest(sender, receiver);
-
         return result instanceof FriendshipResult.Success success
                 ? ResponseEntity.ok(success)
                 : ResponseEntity.badRequest().body((FriendshipResult.Failure) result);
@@ -55,33 +52,51 @@ public class FriendshipController {
     @GetMapping("/getfriends")
     public ResponseEntity<List<AppUser>> getFriends(@RequestParam Long userId) {
         Optional<AppUser> userOpt = userRepository.findById(userId);
-
         if (!userOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-
         AppUser user = userOpt.get();
-
         List<AppUser> friends = friendshipService.getFriends(user);
-
         return ResponseEntity.ok(friends);
     }
 
     @GetMapping("/getFriendRequests")
     public ResponseEntity<List<FriendRequestInfoDTO>> getPendingFriendRequests(@RequestParam Long userId) {
         Optional<AppUser> userOpt = userRepository.findById(userId);
-
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-
         List<FriendRequestInfoDTO> pendingRequests = friendshipService.getPendingFriendRequestsForUser(userId);
-
         if (pendingRequests.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(pendingRequests);
         }
-
         return ResponseEntity.ok(pendingRequests);
+    }
+
+    @PostMapping("/updateStatusRequest/{friendshipId}")
+    public ResponseEntity<FriendshipResult> updateFriendRequestStatus(
+            @PathVariable Long friendshipId,
+            @RequestBody FriendshipRequestStatusDTO statusDTO) {
+        try {
+            FriendshipResult result = friendshipService.updateFriendRequestStatus(friendshipId, statusDTO.getStatus());
+            return result instanceof FriendshipResult.Success
+                    ? ResponseEntity.ok(result)
+                    : ResponseEntity.badRequest().body((FriendshipResult.Failure) result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FriendshipResult.Failure("Failed to update friend request status"));
+        }
+    }
+
+    @PostMapping("/acceptAllRequests")
+    public ResponseEntity<FriendshipResult> acceptAllRequests(@RequestParam Long userId) {
+        try {
+            FriendshipResult result = friendshipService.acceptAllFriendRequests(userId);
+            return result instanceof FriendshipResult.Success
+                    ? ResponseEntity.ok(result)
+                    : ResponseEntity.badRequest().body((FriendshipResult.Failure) result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FriendshipResult.Failure("Failed to accept all requests"));
+        }
     }
 
 

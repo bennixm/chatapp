@@ -3,12 +3,14 @@ package com.example.chatapp.Service;
 import com.example.chatapp.Entity.AppUser;
 import com.example.chatapp.Entity.Friendship;
 import com.example.chatapp.Dto.FriendRequestInfoDTO;
+import com.example.chatapp.Dto.FriendshipRequestStatusDTO;
 import com.example.chatapp.payload.response.FriendshipResult;
 import com.example.chatapp.Repository.UserRepository;
 import com.example.chatapp.Repository.FriendshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -54,7 +56,6 @@ public class FriendshipService {
         return new FriendshipResult.Success("Friendship request sent successfully.");
     }
 
-
     public List<AppUser> getFriends(AppUser user) {
         List<AppUser> friends = new ArrayList<>();
 
@@ -73,6 +74,48 @@ public class FriendshipService {
         return friendshipRepository.findPendingRequestsByUserId(userId);
     }
 
+    public FriendshipResult updateFriendRequestStatus(Long friendshipId, boolean status) {
+        Optional<Friendship> friendshipOpt = friendshipRepository.findById(friendshipId);
 
+        if (friendshipOpt.isEmpty()) {
+            return new FriendshipResult.Failure("Friendship request not found");
+        }
+
+        Friendship friendship = friendshipOpt.get();
+
+        if (friendship.isStatus()) {
+            return new FriendshipResult.Failure("Friendship request already accepted");
+        }
+
+        if (status) {
+            friendship.setStatus(true);
+            friendshipRepository.save(friendship);
+            return new FriendshipResult.Success("Friend request accepted");
+        } else {
+            friendshipRepository.delete(friendship);
+            return new FriendshipResult.Success("Friend request declined");
+        }
+    }
+
+    public FriendshipResult acceptAllFriendRequests(Long userId) {
+        List<FriendRequestInfoDTO> pendingFriendRequests = friendshipRepository.findPendingRequestsByUserId(userId);
+        if (pendingFriendRequests.isEmpty()) {
+            return new FriendshipResult.Failure("No pending friend requests found");
+        }
+
+        for (FriendRequestInfoDTO dto : pendingFriendRequests) {
+            AppUser user = dto.getUser();
+            Long friendshipId = dto.getFriendshipId();
+
+            Optional<Friendship> friendshipOpt = friendshipRepository.findById(friendshipId);
+            if (friendshipOpt.isPresent()) {
+                Friendship friendship = friendshipOpt.get();
+                friendship.setStatus(true);
+                friendshipRepository.save(friendship);
+            }
+        }
+
+        return new FriendshipResult.Success("All pending friend requests have been accepted");
+    }
 
 }

@@ -36,13 +36,13 @@
             </div>
           </router-link>
           <router-link v-for="(friend, index) in friends" :key="index" to="">
-          <div class="chat-item">
-            <div class="chat-item-identity"></div>
-            <div class="chat-item-content">
-              <div class="user-name">{{ friend.username }}</div>
-              <div class="user-chat">some text some text some text some text</div>
+            <div class="chat-item">
+              <div class="chat-item-identity"></div>
+              <div class="chat-item-content">
+                <div class="user-name">{{ friend.username }}</div>
+                <div class="user-chat">some text some text some text some text</div>
+              </div>
             </div>
-          </div>
           </router-link>
         </div><div class="navbar-head-title"><span>AI</span></div>
         <div class="chat-items custom-scrollbar">
@@ -76,8 +76,8 @@
                   <span class="email">sent you a friend request</span>
                 </div>
                 <div class="user-item-buttons">
-                  <button class="send-request-button" @click="acceptRequest(request.friendshipId)"><i class="fa fa-user-plus" aria-hidden="true"></i> Accept</button>
-                  <button class="send-request-button" @click="declineRequest(request.friendshipId)"><i class="fa fa-user-times" aria-hidden="true"></i> Decline</button>
+                  <button class="send-request-button" @click="updateRequestStatus(request.friendshipId, true)"><i class="fa fa-user-plus" aria-hidden="true"></i> Accept</button>
+                  <button class="send-request-button" @click="updateRequestStatus(request.friendshipId, false)"><i class="fa fa-user-times" aria-hidden="true"></i> Decline</button>
                 </div>
               </div>
             </div>
@@ -98,6 +98,7 @@ import { useStore } from 'vuex';
 import { mapGetters } from "vuex";
 import { useRouter } from 'vue-router';
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   name: "NavbarComponent",
@@ -125,14 +126,17 @@ export default {
           return;
         }
 
-        const response = await axios.get("http://localhost:8085/api/friendship/getfriends", {
+        await axios.get("http://localhost:8085/api/friendship/getfriends", {
           params: { userId: userId },
         });
-        console.log(response.data);
-        this.friends = response.data || [];
 
       } catch (error) {
-        console.error("Error fetching friends:", error);
+        const errorMessage = error.response?.data?.message || 'Error fetching friends.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: errorMessage,
+        });
       }
     },
 
@@ -150,10 +154,55 @@ export default {
         this.friendRequests = response.data || [];
 
       } catch (error) {
-        console.error("Error fetching friend requests:", error);
+        const errorMessage = error.response?.data?.message || 'Error fetching friend requests.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: errorMessage,
+        });
       }
     },
 
+    async updateRequestStatus(friendshipId, status) {
+      try {
+        await axios.post(`http://localhost:8085/api/friendship/updateStatusRequest/${friendshipId}`, {
+          status: status
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: status ? 'Friend Request Accepted!' : 'Friend Request Declined!',
+          text: status ? 'You are now friends.' : 'The request was declined.',
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto: false
+        });
+
+        this.fetchFriendRequests();
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Error updating friend request status.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Sorry, your request failed',
+          text: errorMessage,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
+      } finally {
+        this.closeModal();
+      }
+    },
 
     showFriendRequestsPopup() {
       if (this.friendRequests.length > 0) {
@@ -161,25 +210,34 @@ export default {
       }
     },
 
+    async acceptAllRequests() {
+      try {
+        await axios.post("http://localhost:8085/api/friendship/acceptAllRequests", null, {
+          params: { userId: parseInt(this.getUserId) }
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'All Friend Requests Accepted!',
+          text: 'You are now friends with all pending requests.',
+          confirmButtonText: 'Okay'
+        });
+
+        this.fetchFriendRequests();
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to accept all friend requests.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+        });
+      } finally {
+        this.closeModal();
+      }
+    },
+
     closeModal() {
       this.isModalVisible = false;
-    },
-
-    acceptRequest(friendshipId) {
-      console.log(`Accepted friend request with ID: ${friendshipId}`);
-
-      this.closeModal();
-    },
-
-    declineRequest(friendshipId) {
-      console.log(`Declined friend request with ID: ${friendshipId}`);
-
-      this.closeModal();
-    },
-
-    acceptAllRequests() {
-      console.log('Accepted all friend requests');
-      this.closeModal();
     },
   },
   setup() {
@@ -196,7 +254,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-
-</style>
