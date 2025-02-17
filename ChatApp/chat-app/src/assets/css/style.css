@@ -429,6 +429,10 @@ ul{
 .chat-item-identity{
     width:30%;
     border-radius:10px;
+    background-image: url(../images/user-foreign.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .chat-item-content{
     width:70%;
@@ -588,7 +592,11 @@ ul{
 .display-user-item .user-item-identity{
     width:18%;
     border-radius:10px;
-    height:40px;
+    height:70px;
+    background-image:url(../images/user-foreign.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat:no-repeat;
 }
 .display-user-item .user-item-content{
     width:44%;

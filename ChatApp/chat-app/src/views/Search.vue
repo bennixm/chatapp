@@ -34,13 +34,9 @@
 import axios from "axios";
 import { mapGetters } from "vuex";
 import Swal from "sweetalert2";
-import { useRouter } from 'vue-router';
 
 export default {
   name: "SearchPage",
-  setup(){
-    const router = useRouter();
-  },
   data() {
     return {
       users: [],
@@ -117,15 +113,11 @@ export default {
           confirmButtonColor: "#009ca6",
           heightAuto: false
         });
-        if (response.data.message === "You have accepted the friend request!") {
-          setTimeout(() => {
-            router.push({ name: 'NewChat' });
-          }, 2000);
-        } else {
-          setTimeout(() => {
+
+        setTimeout(() => {
             this.fetchUsersAndFriends();
-          }, 2000);
-        }
+        }, 2000);
+
 
       }  catch (error) {
         console.error("Error sending friend request:", error);

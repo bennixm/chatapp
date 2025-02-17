@@ -48,7 +48,6 @@ public class FriendshipController {
                 ? ResponseEntity.ok(success)
                 : ResponseEntity.badRequest().body((FriendshipResult.Failure) result);
     }
-
     @GetMapping("/getfriends")
     public ResponseEntity<List<AppUser>> getFriends(@RequestParam Long userId) {
         Optional<AppUser> userOpt = userRepository.findById(userId);

@@ -1,15 +1,18 @@
 <template>
-  <section>
-    <h2>ChaPage</h2>
-  </section>
+  <ChatWindow :receiverId="receiverId" />
 </template>
 
 <script>
+import ChatWindow from "./ChatWindow.vue";
+import { useRoute } from 'vue-router';
 
 export default {
-name: 'ChatPage',
-    props: {
-      msg: String
-}
+  components: { ChatWindow },
+  setup() {
+    const route = useRoute();
+    const receiverId = route.params.recieverId;
+
+    return { receiverId };
+  }
 };
 </script>

@@ -66,7 +66,7 @@ export default {
           setTimeout(() => {
             store.commit('setUsername', response.data.username);
             store.commit('setUserId', response.data.userId);
-            router.push({ name: 'ChatPage' });
+            router.push({ name: 'DashboardPage' });
           }, 2000);
 
         } else {

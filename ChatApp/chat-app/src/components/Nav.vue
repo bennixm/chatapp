@@ -35,12 +35,15 @@
               <i class="fa fa-plus" aria-hidden="true"></i>
             </div>
           </router-link>
-          <router-link v-for="(friend, index) in friends" :key="index" to="">
+          <router-link
+              v-for="(friend, index) in friends"
+              :key="index"
+              :to="`/chat/${friend.userid}`">
             <div class="chat-item">
               <div class="chat-item-identity"></div>
               <div class="chat-item-content">
                 <div class="user-name">{{ friend.username }}</div>
-                <div class="user-chat">some text some text some text some text</div>
+                <div class="user-chat">.....</div>
               </div>
             </div>
           </router-link>
@@ -126,9 +129,11 @@ export default {
           return;
         }
 
-        await axios.get("http://localhost:8085/api/friendship/getfriends", {
+      const response = await axios.get("http://localhost:8085/api/friendship/getfriends", {
           params: { userId: userId },
         });
+
+        this.friends = response.data || [];
 
       } catch (error) {
         const errorMessage = error.response?.data?.message || 'Error fetching friends.';
@@ -136,6 +141,13 @@ export default {
           icon: 'error',
           title: 'Oops...',
           text: errorMessage,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
       }
     },
@@ -159,6 +171,13 @@ export default {
           icon: 'error',
           title: 'Oops...',
           text: errorMessage,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
       }
     },
@@ -185,6 +204,7 @@ export default {
         });
 
         this.fetchFriendRequests();
+
       } catch (error) {
         const errorMessage = error.response?.data?.message || 'Error updating friend request status.';
         Swal.fire({
@@ -201,6 +221,7 @@ export default {
         });
       } finally {
         this.closeModal();
+        window.location.reload();
       }
     },
 
@@ -220,19 +241,36 @@ export default {
           icon: 'success',
           title: 'All Friend Requests Accepted!',
           text: 'You are now friends with all pending requests.',
-          confirmButtonText: 'Okay'
+          confirmButtonText: 'Okay',
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto: false
         });
 
         this.fetchFriendRequests();
+
       } catch (error) {
         const errorMessage = error.response?.data?.message || 'Failed to accept all friend requests.';
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: errorMessage,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
         });
       } finally {
         this.closeModal();
+        window.location.reload();
       }
     },
 
