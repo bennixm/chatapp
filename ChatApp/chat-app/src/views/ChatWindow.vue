@@ -1,6 +1,6 @@
 <template>
   <div v-if="chat">
-    <h2>Chat with </h2>
+    <h2>Chat with {{ receiverUsername }}</h2>
     <div class="messages">
       <div v-for="message in messages" :key="message.id" class="message">
         <strong>{{ message.senderUsername }}:</strong> {{ message.content }}
@@ -12,19 +12,20 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import WebSocketService from '../../service/websocketService.js';
 
 export default {
-  props: ["receiverId"],
+  props: ["receiverId", "receiverUsername"],
   setup(props) {
     const store = useStore();
     const senderId = store.state.userId;
     const chat = ref(null);
     const messages = ref([]);
     const newMessage = ref("");
+    let socketConnected = false;
 
     const fetchOrCreateChat = async () => {
       try {
@@ -35,9 +36,12 @@ export default {
         });
         chat.value = response.data;
         fetchMessages();
-        WebSocketService.connect(chat.value.chatId, (message) => {
-          messages.value.push(message);
-        });
+        if (!socketConnected) {
+          WebSocketService.connect(chat.value.chatId, (message) => {
+            messages.value.push(message);
+          });
+          socketConnected = true;
+        }
       } catch (error) {
         console.error("Error fetching/creating chat:", error);
       }
@@ -48,7 +52,6 @@ export default {
       try {
         const response = await axios.get(`http://localhost:8085/api/messages/${chat.value.chatId}`);
         messages.value = response.data;
-        console.log(response.data);
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -64,7 +67,6 @@ export default {
       };
 
       try {
-
         await axios.post(`http://localhost:8085/api/messages/send`, null, {
           params: { chatId: message.chatId, senderId: message.senderId, content: message.content },
         });
@@ -79,6 +81,12 @@ export default {
 
     watch(() => props.receiverId, fetchOrCreateChat, { immediate: true });
 
+    onBeforeUnmount(() => {
+      if (socketConnected) {
+        WebSocketService.disconnect();
+      }
+    });
+
     return {
       chat,
       messages,
@@ -88,3 +96,5 @@ export default {
   }
 };
 </script>
+
+
