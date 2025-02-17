@@ -5,7 +5,7 @@ const socketUrl = 'ws://localhost:8085/ws-chat';
 let stompClient = null;
 
 const WebSocketService = {
-    connectWebSocket: (chatId, onMessageReceived) => {
+    connect: (chatId, onMessageReceived) => {
         stompClient = new Client({
             brokerURL: socketUrl,
             onConnect: () => {
@@ -20,7 +20,7 @@ const WebSocketService = {
         stompClient.activate();
     },
 
-    sendWebSocketMessage: (chatId, message) => {
+    sendMessage: (chatId, message) => {
         if (stompClient && stompClient.connected) {
             stompClient.publish({
                 destination: `/app/chat/${chatId}`,
@@ -29,7 +29,7 @@ const WebSocketService = {
         }
     },
 
-    disconnectWebSocket: () => {
+    disconnect: () => {
         if (stompClient) {
             stompClient.deactivate();
         }

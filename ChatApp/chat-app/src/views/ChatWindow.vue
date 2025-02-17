@@ -3,7 +3,7 @@
     <h2>Chat with </h2>
     <div class="messages">
       <div v-for="message in messages" :key="message.id" class="message">
-        <strong>{{ message.sender.username }}:</strong> {{ message.content }}
+        <strong>{{ message.senderUsername }}:</strong> {{ message.content }}
       </div>
     </div>
     <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
@@ -34,9 +34,8 @@ export default {
           }
         });
         chat.value = response.data;
-        console.log(chat.value);
         fetchMessages();
-        WebSocketService.connect(chat.value.id, (message) => {
+        WebSocketService.connect(chat.value.chatId, (message) => {
           messages.value.push(message);
         });
       } catch (error) {
@@ -47,8 +46,9 @@ export default {
     const fetchMessages = async () => {
       if (!chat.value) return;
       try {
-        const response = await axios.get(`http://localhost:8085/api/messages/${chat.value.id}`);
+        const response = await axios.get(`http://localhost:8085/api/messages/${chat.value.chatId}`);
         messages.value = response.data;
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -58,17 +58,19 @@ export default {
       if (!newMessage.value.trim()) return;
 
       const message = {
-        chatId: chat.value.id,
+        chatId: chat.value.chatId,
         senderId: senderId,
         content: newMessage.value,
       };
 
       try {
+
         await axios.post(`http://localhost:8085/api/messages/send`, null, {
-          params: { chatId: message.chatId, senderId: message.senderId, content: message.content }
+          params: { chatId: message.chatId, senderId: message.senderId, content: message.content },
         });
 
-        WebSocketService.sendMessage(chat.value.id, message);
+        WebSocketService.sendMessage(chat.value.chatId, message);
+
         newMessage.value = "";
       } catch (error) {
         console.error("Error sending message:", error);
