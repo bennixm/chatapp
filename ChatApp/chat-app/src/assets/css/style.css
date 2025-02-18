@@ -780,3 +780,114 @@ button {
 .chat-items a{
     text-decoration: none;
 }
+
+.chat-window-space{
+    width:100%;
+    display:flex;
+    flex-direction: column;
+}
+.chat-head{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    padding:10px;
+    border-bottom: 2px solid #ffffff21;
+    padding-bottom:20px;
+}
+.chat-head .chat-img{
+    padding: 5px;
+    height: 40px;
+    width: 40px;
+    background-image:url(../images/user-foreign.png);
+    background-size: cover;
+    background-position: center;
+    border-radius:50%;
+}
+.chat-head .chat-head-name{
+    color:white;
+    padding-left: 20px;
+    font-size:16px;
+}
+.chat-bottom{
+    width:100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-top: 2px solid #ffffff21;
+}
+.chat-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-content::-webkit-scrollbar-track {
+    background: #e9e9e948;
+}
+
+.chat-content::-webkit-scrollbar-thumb {
+    background: #e9e9e962;
+    border-radius: 10px;
+}
+
+.chat-content::-webkit-scrollbar-thumb:hover {
+    background: #e9e9e9c8;
+}
+.chat-content{
+    height:50vh;
+    width:100%;
+    padding:1vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.message-text{
+    display: flex;
+    padding: 10px;
+    width: fit-content;
+    flex-direction: column;
+    border-radius: 5px;
+    margin: 5px;
+    position: relative;
+    max-width: 45%;
+    color: white;
+    text-align: left;
+}
+.message-sent{
+    margin-left: auto;
+    background-color: #00585de0;
+    border-radius: 8px;
+    margin-right:15px;
+}
+.message-received{
+    background-color: rgb(0 0 0 / 39%);
+    border-radius: 8px;
+}
+.chat-input{
+    width:80%;
+    border:none;
+    padding: 15px;
+    background-color: transparent;
+    color:white;
+    outline:none;
+    font-size: 15px;
+}
+.chat-input::placeholder{
+    color:white;
+}
+.chat-button{
+    width:15%;
+    padding: 15px;
+    background-color: #00585de0;
+    transition:all .5s;
+    color:white;
+    font-weight: bold;
+    cursor:pointer;
+}
+.chat-button:hover{
+    background-color: #00585d;
+}
+.message-time{
+    padding:4px;
+    width:100%;
+    text-align:right;
+    color:white;
+    font-size:12px;
+}

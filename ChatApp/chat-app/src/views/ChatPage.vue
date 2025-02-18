@@ -1,5 +1,5 @@
 <template>
-  <ChatWindow :receiverId="receiverId" />
+  <ChatWindow :receiverId="receiverId"/>
 </template>
 
 <script>
@@ -10,8 +10,7 @@ export default {
   components: { ChatWindow },
   setup() {
     const route = useRoute();
-    const receiverId = route.params.recieverId;
-
+    const receiverId = route.params.receiverId;
     return { receiverId };
   }
 };

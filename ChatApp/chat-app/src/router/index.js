@@ -40,12 +40,11 @@ const routes = [
       },
   },
   {
-    path: '/chat/:recieverId',
+    path: '/chat/:receiverId',  // Add receiverUsername to the path
     name: 'ChatPage',
     component: ChatPage,
     beforeEnter: (to, from, next) => {
       const store = useStore();
-
       if (!store.state.username) {
         next('/login');
       } else {
