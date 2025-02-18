@@ -2,7 +2,7 @@
   <div v-if="chat" class="chat-window-space chat-window">
     <div class="chat-head">
       <div class="chat-img"></div>
-    <span class="chat-head-name">{{ receiverUsername }}</span>
+      <span class="chat-head-name">{{ receiverUsername }}</span>
     </div>
     <div class="chat-content messages">
       <div
@@ -19,8 +19,8 @@
       </div>
     </div>
     <div class="chat-bottom">
-    <input class="chat-input" v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
-    <button class="chat-button" @click="sendMessage"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+      <input class="chat-input" v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
+      <button class="chat-button" @click="sendMessage"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
     </div>
   </div>
 </template>
@@ -29,6 +29,9 @@
 import { ref, watch, nextTick } from 'vue';
 import axios from 'axios';
 import { useStore } from 'vuex';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
+
 
 export default {
   props: ["receiverId"],
@@ -41,6 +44,22 @@ export default {
     const newMessage = ref("");
     const receiverUsername = ref("");
 
+    let stompClient = null;
+
+    const connectWebSocket = () => {
+      const socket = new SockJS('http://localhost:8085/ws-chat');
+      stompClient = Stomp.over(socket);
+
+
+      stompClient.connect({}, (frame) => {
+        console.log('Connected to WebSocket:', frame);
+        stompClient.subscribe(`/topic/messages/${chat.value.chatId}`, (messageOutput) => {
+          const message = JSON.parse(messageOutput.body);
+          messages.value.push(message);
+          scrollToBottom();
+        });
+      });
+    };
 
     const fetchOrCreateChat = async () => {
       try {
@@ -55,7 +74,7 @@ export default {
 
         fetchMessages();
 
-        scrollToBottom();
+        connectWebSocket();
       } catch (error) {
         console.error("Error fetching/creating chat:", error);
       }
@@ -85,10 +104,7 @@ export default {
         await axios.post(`http://localhost:8085/api/messages/send`, null, {
           params: { chatId: message.chatId, senderId: message.senderId, content: message.content },
         });
-
-
         scrollToBottom();
-
         newMessage.value = "";
       } catch (error) {
         console.error("Error sending message:", error);
@@ -124,7 +140,6 @@ export default {
     };
 
     watch(() => props.receiverId, fetchOrCreateChat, { immediate: true });
-
 
     return {
       chat,
