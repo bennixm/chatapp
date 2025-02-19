@@ -2,6 +2,8 @@
 
 This is a Chat Application built with **Vue.js**, **Spring Boot**, and **MySQL**. It allows users to register, log in, search for people, send and receive friendship requests, and chat with friends in real-time.
 
+![Preview IMG](https://github.com/bennixm/chatapp/blob/5311c4f105b1232cb8037f513c784b4782ab5eb5/Screenshot%202025-02-19%20at%2009.05.38.png)
+
 ## Features
 - **User Registration**: Users can create an account with their credentials.
 - **Login System**: Registered users can log in to their accounts.
