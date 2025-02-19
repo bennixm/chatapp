@@ -8,7 +8,8 @@ This is a Chat Application built with **Vue.js**, **Spring Boot**, and **MySQL**
 - **User Registration**: Users can create an account with their credentials.
 - **Login System**: Registered users can log in to their accounts.
 - **Search for People**: Users can search for other users to send friendship requests.
-- **Friendship Requests**: Once a friendship request is accepted, users can see their friends in the sidebar.
+- **Friend Requests**: Users can send requests of friendship to other users.
+- **Friendships**: Once a friendship request is accepted, users can see their friends in the sidebar.
 - **Real-Time Chat**: Users can chat with their friends in real-time through the chat interface.
 
 ## Getting Started
