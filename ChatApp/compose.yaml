@@ -8,30 +8,40 @@ services:
     networks:
       - app-network
     depends_on:
-      - mysql # Make sure the backend waits for MySQL to be ready
+      - mysql
 
   frontend:
     build:
       context: ./chat-app
     ports:
-      - "8081:8080"  # Expose frontend on port 8081 on the host
+      - "8081:8080"
     networks:
       - app-network
     depends_on:
       - backend
 
   mysql:
-    image: mysql:8.0 # Use MySQL 8.0 (you can choose the version you prefer)
+    image: mysql:8.0
     container_name: mysql-chat-app
     environment:
-      MYSQL_ROOT_PASSWORD: chatapp99  # Set the MySQL root password
-      MYSQL_DATABASE: chatapp         # Create a default database
+      MYSQL_ROOT_PASSWORD: chatapp99
+      MYSQL_DATABASE: chatapp
     networks:
       - app-network
     ports:
-      - "3306:3306"  # Expose MySQL on port 3306
+      - "3306:3306"
     volumes:
-      - mysql-data:/var/lib/mysql  # Persist data across container restarts
+      - mysql-data:/var/lib/mysql
+
+  python-service:
+    build:
+      context: ./py-service
+    ports:
+      - "5001:5000"
+    networks:
+      - app-network
+    depends_on:
+      - mysql
 
 networks:
   app-network:

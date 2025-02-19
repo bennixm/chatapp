@@ -8,6 +8,7 @@ import LoginPage from '@/views/Login.vue';
 import SettingsPage from '@/views/Settings.vue';
 import SearchPage from '@/views/Search.vue';
 import NewChat from '@/views/NewChat.vue';
+import StatsPage from '@/views/StatsPage.vue';
 
 const routes = [
   { path: '/', name: 'HomePage', component: HomePage },
@@ -38,6 +39,20 @@ const routes = [
          next();
           }
       },
+  },
+  {
+    path: '/stats',
+    name: 'Stats',
+    component: StatsPage,
+    beforeEnter: (to, from, next) => {
+      const store = useStore();
+
+      if (!store.state.username) {
+        next('/login');
+      } else {
+        next();
+      }
+    },
   },
   {
     path: '/chat/:receiverId',  // Add receiverUsername to the path
