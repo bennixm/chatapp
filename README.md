@@ -18,7 +18,7 @@ This is a Chat Application built with **Vue.js**, **Spring Boot**, and **MySQL**
 Make sure you have the following installed:
 - **Node.js** for the Vue.js frontend
 - **MySQL** for the database
-- **Java JDK** for running the Spring Boot backend ( for me i use SAP but you can use Java JDK)
+- **Java JDK** for running the Spring Boot backend ( for me i use SAP's JDK but you can use Java JDK -- check the config and edit there)
 
 ### Installation
 
