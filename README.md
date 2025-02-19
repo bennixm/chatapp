@@ -21,6 +21,8 @@ Make sure you have the following installed:
 - **Java JDK** for running the Spring Boot backend ( for me i use SAP's JDK but you can use Java JDK -- check the config and edit there)
 
 ### Installation
+     cd Chatapp
+     ```
 
 1. **Clone the repository**:
    ```bash
@@ -28,9 +30,9 @@ Make sure you have the following installed:
    cd chatapp
    
 2. **Frontend Setup** (Vue.js):
-   - Navigate to the `chatapp/` directory and install the required dependencies:
+   - Navigate to the `chat-app/` directory and install the required dependencies:
      ```bash
-     cd chatapp
+     cd chat-app
      npm install
      ```
 
@@ -103,7 +105,7 @@ chat-application/
 │   │   ├── resources/
 │   │   │   ├── application.properties  # Database and server configurations
 │   ├── pom.xml                        # Maven dependencies for Spring Boot
-├── chatapp/
+├── chat-app/
 │   ├── src/
 │   │   ├── assets/                    # Static assets (images, styles)
 │   │   ├── components/                # Vue.js components (Registration, Login, Search, Chat, Sidebar)
