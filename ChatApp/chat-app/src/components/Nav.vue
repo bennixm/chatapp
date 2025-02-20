@@ -3,6 +3,7 @@
     <div class="mini-navbar-element" v-if="username">
       <div class="mini-nav-item"><router-link to="/find-people"><i class="fa fa-search" aria-hidden="true"></i></router-link></div>
       <div class="mini-nav-item"><router-link to="/new-chat"><i class="fa fa-users" aria-hidden="true"></i></router-link></div>
+      <div class="mini-nav-item"><router-link to="/stats"><i class="fa fa-line-chart" aria-hidden="true"></i></router-link></div>
       <div class="mini-nav-item"><router-link to="/settings"><i class="fa fa-cog" aria-hidden="true"></i></router-link></div>
     </div>
     <div class="navbar-element">

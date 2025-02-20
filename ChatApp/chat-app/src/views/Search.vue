@@ -6,7 +6,8 @@
     <div class="content-page">
       <div class="search-section" v-if="!loading">
         <div class="search-section-content" v-if="users.length">
-          <div class="display-user-item" v-for="user in users" :key="user.userid">
+          <div class="users-fetch">
+          <div class="display-user-item" v-for="user in currentPageUsers" :key="user.userid">
             <div class="user-item-identity"></div>
             <div class="user-item-content">
               <span class="username">{{ user.username }}</span>
@@ -20,11 +21,25 @@
               </button>
             </div>
           </div>
+          </div>
+          <div class="pagination">
+            <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
+            <span>{{ currentPage }} / {{ totalPages }}</span>
+            <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
+          </div>
         </div>
         <div class="search-section-content" v-else>
           <span class="feedback-request">No users found.</span>
         </div>
-        <div class="search-nav"></div>
+        <div class="search-nav">
+          <div class="search-input">
+            <input
+                type="text"
+                v-model="searchQuery"
+                placeholder="Search by username"
+                @input="filterUsers"/>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -41,12 +56,24 @@ export default {
     return {
       users: [],
       allUsers: [],
+      filteredUsers: [],
       friends: [],
       loading: true,
+      currentPage: 1,
+      itemsPerPage: 8,
+      searchQuery: '',
     };
   },
   computed: {
     ...mapGetters(["getUserId"]),
+    totalPages() {
+      return Math.ceil(this.filteredUsers.length / this.itemsPerPage);
+    },
+    currentPageUsers() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredUsers.slice(start, end);
+    }
   },
   created() {
     this.fetchUsersAndFriends();
@@ -68,11 +95,12 @@ export default {
           return !isCurrentUser && !isFriend;
         });
 
+        this.filteredUsers = [...this.users];
       } catch (error) {
         console.error("There was an error fetching the users:", error);
       } finally {
-      this.loading = false;
-    }
+        this.loading = false;
+      }
     },
     async getUserFriends(userId) {
       try {
@@ -102,7 +130,6 @@ export default {
           icon: 'success',
           title: 'Friend Request Sent!',
           text: response.data.message,
-
           timer: 2000,
           showConfirmButton: false,
           customClass: {
@@ -115,11 +142,9 @@ export default {
         });
 
         setTimeout(() => {
-            this.fetchUsersAndFriends();
+          this.fetchUsersAndFriends();
         }, 2000);
-
-
-      }  catch (error) {
+      } catch (error) {
         console.error("Error sending friend request:", error);
 
         const errorMessage = error.response?.data?.errorMessage || 'Error sending friend request.';
@@ -137,8 +162,21 @@ export default {
           heightAuto:false
         });
       }
+    },
+    filterUsers() {
+      if (this.searchQuery.trim() === '') {
+        this.filteredUsers = [...this.users];
+      } else {
+        this.filteredUsers = this.users.filter(user =>
+            user.username.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      }
+      this.currentPage = 1;
+    },
+    goToPage(page) {
+      if (page < 1 || page > this.totalPages) return;
+      this.currentPage = page;
     }
   },
 };
 </script>
-

@@ -172,7 +172,7 @@ ul{
     color:#009ca6 !important;
 }
 .content{
-    min-height: 74vh;
+    min-height: 64vh;
     backdrop-filter: blur(4px);
     background-color:rgba(0,0,0,.25);
     border-radius: 8px;
@@ -196,7 +196,8 @@ ul{
     height:100%;
     display:flex;
     flex-direction: row;
-    align-items: center;
+    padding-top: 10vh;
+    align-items: flex-start;
 }
 
 .box *{
@@ -447,6 +448,7 @@ ul{
     color:white;
     font-weight: bold;
     text-align: left;
+    overflow-wrap: break-word;
 }
 .chat-item-content .user-chat{
     padding:5px;
@@ -559,7 +561,7 @@ ul{
     justify-content: space-between;
 }
 .search-section-content{
-    width:65%;
+    width:69%;
     display:flex;
     flex-direction: column;
 }
@@ -579,7 +581,7 @@ ul{
     width:30%;
 }
 .display-user-item{
-    width:90%;
+    width:100%;
     padding:10px;
     display:flex;
     flex-direction: row;
@@ -588,6 +590,7 @@ ul{
     border-radius: 8px;
     border: 1px solid #ffffff21;
     color: white;
+    margin-bottom: 2px;
 }
 .display-user-item .user-item-identity{
     width:18%;
@@ -648,10 +651,6 @@ ul{
 .send-request-button:hover{
     background-color: rgba(0, 156, 166, 0.4);
 }
-.search-section-content {
-    margin-top: 20px;
-}
-
 .search-nav {
     text-align: center;
     padding: 10px;
@@ -819,10 +818,6 @@ button {
     width: 10px;
 }
 
-.chat-content::-webkit-scrollbar-track {
-    background: #e9e9e948;
-}
-
 .chat-content::-webkit-scrollbar-thumb {
     background: #e9e9e962;
     border-radius: 10px;
@@ -832,7 +827,7 @@ button {
     background: #e9e9e9c8;
 }
 .chat-content{
-    height:50vh;
+    height:70vh;
     width:100%;
     padding:1vh;
     overflow-x: hidden;
@@ -849,6 +844,7 @@ button {
     max-width: 45%;
     color: white;
     text-align: left;
+    overflow-wrap: break-word;
 }
 .message-sent{
     margin-left: auto;
@@ -890,4 +886,33 @@ button {
     text-align:right;
     color:white;
     font-size:12px;
+}
+.pagination{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top:20px;
+    padding-bottom: 10px;
+}
+.pagination span{
+    color:white;
+    font-weight: bold;
+    padding:5px;
+}
+.search-nav .search-input input{
+    width:100%;
+    padding:15px;
+    font-size:16px;
+    color:white;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    border: 1px solid white;
+    margin-bottom: 10px;
+    outline:none;
+}
+.search-nav .search-input input::placeholder{
+    color:white;
 }

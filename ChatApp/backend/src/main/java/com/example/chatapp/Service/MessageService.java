@@ -27,6 +27,10 @@ public class MessageService {
 
     @Transactional
     public ChatMessage sendMessage(Long chatId, Long senderId, String content) {
+        if (content.length() > 255) {
+            throw new IllegalArgumentException("Message cannot exceed 255 characters.");
+        }
+
         Chat chat = chatRepository.findById(chatId).orElseThrow();
         AppUser sender = userRepository.findById(senderId).orElseThrow();
 

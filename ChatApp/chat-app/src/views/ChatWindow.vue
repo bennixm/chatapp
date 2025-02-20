@@ -31,6 +31,7 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
+import Swal from 'sweetalert2';
 
 
 export default {
@@ -92,6 +93,23 @@ export default {
     };
 
     const sendMessageToChat = async () => {
+
+      if (newMessage.value.length > 250) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Message too long',
+          text: 'Your message cannot exceed 250 characters.',
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
+        return;
+      }
+
       if (!newMessage.value.trim()) return;
 
       const message = {
