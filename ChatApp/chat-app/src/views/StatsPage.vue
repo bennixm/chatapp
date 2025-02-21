@@ -1,15 +1,17 @@
 <template>
   <div class="panel-page">
-    <div class="header-page">
-      <span class="title-page">Statistics</span>
-    </div>
-    <div class="content-page">
-      <p>Users Count: {{ user_count }}</p>
-      <div>
+      <div class="header-page">
+        <span class="title-page">Statistics</span>
+      </div>
+    <div class="stats-content">
+      <div class="content-page">
+        <p>Users Count: {{ user_count }}</p>
+      </div>
+      <div class="search-nav">
         <button @click="generateUsers">Generate 50 Users</button>
-        <p v-if="message">{{ message }}</p>
-        <button @click="generateFriendships">Generate 25 Friendships</button>
-        <p v-if="message_friendship">{{ message_friendship }}</p>
+        <button @click="generateFriendships">Generate 50 Friendships</button>
+        <button @click="generateChats">Generate 50 Chats</button>
+        <button @click="generateMessages">Generate 100 Messages</button>
       </div>
     </div>
   </div>
@@ -17,14 +19,13 @@
 
 <script>
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 export default {
   name: 'StatsPage',
   data() {
     return {
       user_count: 0,
-      message: "",
-      message_friendship: "",
     };
   },
   methods: {
@@ -34,10 +35,33 @@ export default {
           method: "POST",
         });
         const data = await response.json();
-        this.message = data.message;
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: data.message,
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
       } catch (error) {
-        console.error("Error generating users:", error);
-        this.message = "Failed to generate users.";
+        Swal.fire({
+          icon: "error",
+          title: "Fail!",
+          text: "Failed to generate users..",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
       }
     },
     async generateFriendships() {
@@ -46,11 +70,103 @@ export default {
           method: "POST",
         });
         const data = await response.json();
-
-        this.message_friendship = data.message;
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: data.message,
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
       } catch (error) {
-        console.error("Error generating friendships:", error);
-        this.message_friendship = "Failed to generate friendships.";
+        Swal.fire({
+          icon: "error",
+          title: "Fail!",
+          text: "Failed to generate friendships",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
+      }
+    },
+    async generateChats() {
+      try {
+        const response = await fetch("http://localhost:5001/generate_chats", {
+          method: "POST",
+        });
+        const data = await response.json();
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: data.message,
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Fail!",
+          text: "Failed to generate chats",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
+      }
+    },
+    async generateMessages() {
+      try {
+        const response = await fetch("http://localhost:5001/generate_messages", {
+          method: "POST",
+        });
+        const data = await response.json();
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: data.message,
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Fail!",
+          text: "Failed to generate chats",
+          customClass: {
+            popup: "custom-popup",
+          },
+          background: "#000000e0",
+          color: "#ffffff",
+          confirmButtonColor: "#009ca6",
+          heightAuto:false
+        });
       }
     }
   },
@@ -60,7 +176,18 @@ export default {
           this.user_count = response.data.user_count;
         })
         .catch(error => {
-          console.error("There was an error fetching the statistics:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Fail!",
+            text: "There was an error fetching the statistics:" +  error,
+            customClass: {
+              popup: "custom-popup",
+            },
+            background: "#000000e0",
+            color: "#ffffff",
+            confirmButtonColor: "#009ca6",
+            heightAuto:false
+          });
         });
   }
 };

@@ -1,1 +1,4 @@
 git rm --cached lib
+
+# Ignore the OpenAI config file
+py-service/openaiconfig.py
