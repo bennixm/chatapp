@@ -14,6 +14,8 @@ RUN npm install vuex@next
 RUN npm install sweetalert2 vue-sweetalert2
 RUN npm install sockjs-client stompjs
 RUN npm install @stomp/stompjs
+RUN npm install vue-chartjs chart.js
+
 
 # Copy the Vue.js application source code
 COPY . .

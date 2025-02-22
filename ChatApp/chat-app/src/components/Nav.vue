@@ -103,6 +103,7 @@ import { mapGetters } from "vuex";
 import { useRouter } from 'vue-router';
 import axios from "axios";
 import Swal from "sweetalert2";
+import { eventBus } from '../events/eventBus';
 
 export default {
   name: "NavbarComponent",
@@ -119,6 +120,10 @@ export default {
   created() {
     this.fetchFriends();
     this.fetchFriendRequests();
+  },
+  mounted() {
+    eventBus.fetchFriendsEvent = this.fetchFriends;
+    eventBus.fetchFriendRequestsEvent = this.fetchFriendRequests;
   },
   methods: {
     async fetchFriends() {

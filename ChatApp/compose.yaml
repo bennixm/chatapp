@@ -37,7 +37,7 @@ services:
     build:
       context: ./py-service
     ports:
-      - "5001:5000"
+      - "5001:5001"
     networks:
       - app-network
     depends_on:

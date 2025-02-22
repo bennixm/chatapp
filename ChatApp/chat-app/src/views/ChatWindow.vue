@@ -1,8 +1,15 @@
 <template>
   <div v-if="chat" class="chat-window-space chat-window">
     <div class="chat-head">
-      <div class="chat-img"></div>
-      <span class="chat-head-name">{{ receiverUsername }}</span>
+      <div class="chat-user-heading">
+        <div class="chat-img"></div>
+        <span class="chat-head-name">{{ receiverUsername }}</span>
+      </div>
+      <div class="chat-button-heading">
+        <button @click="toggleTimeFormat">
+          <i class="fa fa-clock-o" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
     <div class="chat-content messages">
       <div
@@ -33,7 +40,6 @@ import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import Swal from 'sweetalert2';
 
-
 export default {
   props: ["receiverId"],
   setup(props) {
@@ -44,13 +50,13 @@ export default {
     const messages = ref([]);
     const newMessage = ref("");
     const receiverUsername = ref("");
+    const showTime = ref(false); // State to toggle time format
 
     let stompClient = null;
 
     const connectWebSocket = () => {
       const socket = new SockJS('http://localhost:8085/ws-chat');
       stompClient = Stomp.over(socket);
-
 
       stompClient.connect({}, (frame) => {
         console.log('Connected to WebSocket:', frame);
@@ -70,11 +76,8 @@ export default {
           }
         });
         chat.value = response.data;
-
         receiverUsername.value = chat.value.user1Username === sessionUsername ? chat.value.user2Username : chat.value.user1Username;
-
         fetchMessages();
-
         connectWebSocket();
       } catch (error) {
         console.error("Error fetching/creating chat:", error);
@@ -86,6 +89,7 @@ export default {
       try {
         const response = await axios.get(`http://localhost:8085/api/messages/${chat.value.chatId}`);
         messages.value = response.data;
+        sortMessages();
         scrollToBottom();
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -93,7 +97,6 @@ export default {
     };
 
     const sendMessageToChat = async () => {
-
       if (newMessage.value.length > 250) {
         Swal.fire({
           icon: 'error',
@@ -133,6 +136,19 @@ export default {
       const now = new Date();
       const messageTime = new Date(timestamp);
       const timeString = messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateString = messageTime.toLocaleDateString();
+
+      if (showTime.value) {
+        if (now.toDateString() === messageTime.toDateString()) {
+          return `${dateString} ${timeString}`;
+        }
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        if (yesterday.toDateString() === messageTime.toDateString()) {
+          return `Yesterday, ${timeString}`;
+        }
+        return `${dateString} ${timeString}`;
+      }
 
       if (now.toDateString() === messageTime.toDateString()) {
         return timeString;
@@ -145,7 +161,19 @@ export default {
         return `Yesterday, ${timeString}`;
       }
 
-      return messageTime.toLocaleDateString();
+      return dateString;
+    };
+
+    const sortMessages = () => {
+      messages.value.sort((a, b) => {
+        const timestampA = new Date(a.timestamp);
+        const timestampB = new Date(b.timestamp);
+        if (isNaN(timestampA) || isNaN(timestampB)) {
+          console.error("Invalid timestamp:", a.timestamp, b.timestamp);
+          return 0;
+        }
+        return timestampA - timestampB;
+      });
     };
 
     const scrollToBottom = () => {
@@ -157,6 +185,14 @@ export default {
       });
     };
 
+    const toggleTimeFormat = () => {
+      showTime.value = !showTime.value;
+    };
+
+    watch(showTime, () => {
+      messages.value = [...messages.value];
+    });
+
     watch(() => props.receiverId, fetchOrCreateChat, { immediate: true });
 
     return {
@@ -166,6 +202,7 @@ export default {
       sendMessage: sendMessageToChat,
       formatTimestamp,
       receiverUsername,
+      toggleTimeFormat, // Expose the toggle method
     };
   }
 };

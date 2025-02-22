@@ -1,11 +1,30 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import mysql.connector
+from datetime import datetime
 import generators  # we take all the generators from generators.py
-from getters import get_user_count  # we take the user count function from getters
+from getters import get_user_count, get_messages  # we take the user count function from getters
+
+import pandas as pd
+import numpy as np
+import requests
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+import threading
+
+import logging
+
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+import seaborn as sns
+
+
+
+
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:8081"])  # Allow requests from Vue.js frontend
+CORS(app, origins=["http://localhost:8081"])
 
 @app.route("/stats", methods=["GET"])
 def stats():
@@ -33,9 +52,9 @@ def generate_users():
     ]
 
     # Call the generator to create users
-    generators.generate_users(first_names, last_names, num_users=50)
+    generators.generate_users(first_names, last_names, num_users=10)
 
-    return jsonify({"message": "50 users have been generated and inserted into the database!"})
+    return jsonify({"message": "10 users have been generated and inserted into the database!"})
 
 # Route to generate friendships
 @app.route("/generate_friendships", methods=["POST"])
@@ -56,11 +75,275 @@ def generate_chats():
 @app.route("/generate_messages", methods=["POST"])
 def generate_messages():
     num_messages=4
-    num_chats=25
-    result = generators.generate_messages(num_chats, num_messages)  # Generate 4 messages (2 per user), for 25 chats
+    num_chats=50
+    result = generators.generate_messages(num_chats, num_messages)  # Generate 4 messages (2 per user), for 50 chats
     return jsonify({"message": result})
+
+
+@app.route("/get_messages", methods=["GET"])
+def get_messages_endpoint():
+    # Get sender_id from query parameters
+    sender_id = request.args.get("sender_id", type=int)
+
+    # Fetch messages based on sender_id
+    messages = get_messages(sender_id)
+
+    return jsonify({"messages": messages})
+
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+model = None
+def train_model():
+    global model
+    logging.info("Fetching messages to train the model...")
+    try:
+        response = requests.get("http://localhost:5001/get_messages")
+        messages = response.json()["messages"]
+    except Exception as e:
+        logging.error(f"Error fetching messages: {e}")
+        return
+
+    if len(messages) < 2:
+        logging.warning("Not enough data to train the model.")
+        return
+
+    # Convert messages to a DataFrame
+    df = pd.DataFrame(messages)
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+    # Sort messages by sender and time
+    df = df.sort_values(by=["sender_id", "timestamp"])
+
+    # Compute response time (time difference between messages)
+    df["response_time"] = df.groupby("sender_id")["timestamp"].diff().dt.total_seconds()
+
+    # Ignore responses where the previous message was sent >1 day ago (but keep the info for model)
+    df["is_long_gap"] = df["response_time"] > 86400  # 86400 seconds = 1 day
+    df["response_time"] = df["response_time"].where(df["response_time"] <= 86400)
+
+    # Drop NaN values (first message of a user has no previous message)
+    df = df.dropna()
+
+    if df.empty:
+        logging.warning("No valid response times after filtering.")
+        return
+
+    # Add additional features for better prediction
+    df["hour_of_day"] = df["timestamp"].dt.hour
+    df["day_of_week"] = df["timestamp"].dt.dayofweek
+    df["user_avg_response_time"] = df.groupby("sender_id")["response_time"].transform("mean")
+
+    # Calculate the time since last message (time gap since user's last activity)
+    df["time_since_last_message"] = df.groupby("sender_id")["timestamp"].diff().dt.total_seconds().fillna(0)
+
+    # Filter out extreme long gaps (over 1 day)
+    df = df[df["response_time"] <= 86400]
+
+    # Define the list of features to be used for training
+    features = ["sender_id", "hour_of_day", "day_of_week", "user_avg_response_time", "time_since_last_message", "is_long_gap"]
+
+    # Ensure that all columns in `features` exist in the DataFrame
+    missing_columns = [col for col in features if col not in df.columns]
+    if missing_columns:
+        logging.error(f"Missing columns in data: {', '.join(missing_columns)}")
+        return
+
+    X = df[features]
+    y = df["response_time"]
+
+    # Handle edge case: Not enough data for a meaningful split
+    if len(X) > 1:
+        logging.info("Splitting data into train/test sets...")
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # Train the model
+        model = RandomForestRegressor(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+
+        logging.info("Model trained successfully!")
+        # Optional: Print feature importance to see what's influencing predictions
+        logging.info(f"Feature Importances: {model.feature_importances_}")
+    else:
+        logging.warning("Not enough data to split into train/test sets.")
+
+
+@app.route("/predict_response_time", methods=["POST"])
+def predict_response_time():
+    global model
+    if model is None:
+        return jsonify({"error": "Model is not trained yet."}), 503
+
+    # Get the input data from the request
+    data = request.json
+
+    # Check if 'timestamp' exists in the request, if not, use current time
+    if "timestamp" not in data:
+        timestamp = datetime.now()
+    else:
+        try:
+            timestamp = pd.to_datetime(data["timestamp"])  # Ensure it's a valid datetime
+        except Exception as e:
+            return jsonify({"error": f"Invalid timestamp format: {str(e)}"}), 400
+
+    sender_id = data.get("sender_id")  # This assumes sender_id is required
+    if not sender_id:
+        return jsonify({"error": "sender_id is required"}), 400
+
+    # Fetch historical messages for the sender (using the modified get_messages function)
+    response = requests.get(f"http://localhost:5001/get_messages?sender_id={sender_id}")
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch messages for the sender."}), 500
+
+    messages = response.json().get("messages", [])
+
+    # Log the fetched messages for debugging purposes
+    logging.info(f"Fetched {len(messages)} messages for sender_id: {sender_id}")
+
+    # If there are no previous messages, we set default values
+    if len(messages) == 0:
+        user_avg_response_time = 0
+        time_since_last_message = 0
+        is_long_gap = False
+    else:
+        # Process the fetched messages as before
+        df = pd.DataFrame(messages)
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        df = df.sort_values(by=["sender_id", "timestamp"])
+
+        df["response_time"] = df.groupby("sender_id")["timestamp"].diff().dt.total_seconds()
+        df["time_since_last_message"] = df["timestamp"].diff().dt.total_seconds().fillna(0)
+
+        # Calculate user-level features
+        user_avg_response_time = df["response_time"].mean()
+        time_since_last_message = df["time_since_last_message"].iloc[-1]
+        is_long_gap = time_since_last_message > 86400  # 1 day = 86400 seconds
+
+    # Prepare features and predict
+    X_new = pd.DataFrame({
+        "sender_id": [sender_id],
+        "timestamp": [timestamp]
+    })
+
+    # Add features like hour of day, day of week, etc.
+    X_new["hour_of_day"] = X_new["timestamp"].dt.hour
+    X_new["day_of_week"] = X_new["timestamp"].dt.dayofweek
+    X_new["user_avg_response_time"] = user_avg_response_time
+    X_new["time_since_last_message"] = time_since_last_message
+    X_new["is_long_gap"] = is_long_gap
+
+    # Select features for prediction
+    features = ["sender_id", "hour_of_day", "day_of_week", "user_avg_response_time", "time_since_last_message", "is_long_gap"]
+    X_new = X_new[features]
+
+    # Predict the response time
+    try:
+        prediction = model.predict(X_new)[0]
+        return jsonify({"predicted_response_time": round(prediction, 2)})
+    except Exception as e:
+        return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
+
+
+@app.route("/train", methods=["GET"])
+def train():
+    try:
+        threading.Thread(target=train_model).start()
+        return jsonify({"message": "Model training started in the background!"})
+    except Exception as e:
+        return jsonify({"error": f"Failed to start model training: {str(e)}"}), 500
+
+@app.route("/generate_graph", methods=["GET"])
+def generate_graph():
+    try:
+        np.random.seed(42)
+
+        # Generate dummy data (representing the features)
+        num_samples = 1000
+        sender_ids = np.random.choice([1, 2, 3, 4, 5], num_samples)
+        timestamps = pd.date_range('2024-01-01', periods=num_samples, freq='h')
+        response_times = np.random.gamma(2, 5, num_samples)
+        hours_of_day = timestamps.hour
+        day_of_week = timestamps.dayofweek
+
+        # Create the DataFrame
+        df = pd.DataFrame({
+            'sender_id': sender_ids,
+            'timestamp': timestamps,
+            'response_time': response_times,
+            'hour_of_day': hours_of_day,
+            'day_of_week': day_of_week
+        })
+
+        # Create a BytesIO buffer to store the image
+        img = BytesIO()
+
+        # Plot 1: Response Time by Hour of the Day
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(data=df, x='hour_of_day', y='response_time')
+        plt.title('Response Time by Hour of the Day')
+        plt.xlabel('Hour of the Day')
+        plt.ylabel('Response Time (seconds)')
+        plt.grid(True)
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img_data_1 = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.clf()  # Clear the current figure
+
+        # Plot 2: Response Time by Day of the Week
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(data=df, x='day_of_week', y='response_time')
+        plt.title('Response Time by Day of the Week')
+        plt.xlabel('Day of the Week')
+        plt.ylabel('Response Time (seconds)')
+        plt.grid(True)
+        plt.xticks([0, 1, 2, 3, 4, 5, 6], ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img_data_2 = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.clf()
+
+        # Plot 3: User's Average Response Time by Sender
+        avg_response_time = df.groupby('sender_id')['response_time'].mean().reset_index()
+        plt.figure(figsize=(10, 6))
+        sns.barplot(data=avg_response_time, x='sender_id', y='response_time')
+        plt.title('Average Response Time by Sender')
+        plt.xlabel('Sender ID')
+        plt.ylabel('Average Response Time (seconds)')
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img_data_3 = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.clf()
+
+        # Plot 4: Time Since Last Message vs Response Time
+        df['time_since_last_message'] = df.groupby('sender_id')['timestamp'].diff().dt.total_seconds().fillna(0)
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(data=df, x='time_since_last_message', y='response_time', hue='sender_id', palette='Set1')
+        plt.title('Time Since Last Message vs Response Time')
+        plt.xlabel('Time Since Last Message (seconds)')
+        plt.ylabel('Response Time (seconds)')
+        plt.grid(True)
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img_data_4 = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.clf()
+
+        return jsonify({
+            "graph_1": img_data_1,
+            "graph_2": img_data_2,
+            "graph_3": img_data_3,
+            "graph_4": img_data_4
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 if __name__ == "__main__":
     # Run the Flask app
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)

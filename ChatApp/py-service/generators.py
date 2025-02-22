@@ -1,10 +1,8 @@
 import random
 import bcrypt
 import time
-
 import openai
 import openaiconfig
-
 from datetime import datetime, timedelta
 from db_conn import get_db_connection  # Import the connection function
 
@@ -38,7 +36,7 @@ def generate_random_date():
     return start_date + timedelta(days=random_days)
 
 # Function to generate users
-def generate_users(first_names, last_names, num_users=50):
+def generate_users(first_names, last_names, num_users=10):
     connection = get_db_connection()
     if not connection:
         print("Failed to connect to the database.")
@@ -100,9 +98,6 @@ def generate_friendships(num_friendships=50):
 
     cursor.close()
     connection.close()
-
-import random
-from db_conn import get_db_connection
 
 # Helper function to check if a chat already exists
 def chat_exists(cursor, user1_id, user2_id):
@@ -197,8 +192,13 @@ def generate_messages(num_chats, num_messages):
         for i, message in enumerate(conversation):
             sender_id = user1_id if i % 2 == 0 else user2_id
 
-            # Generate a random interval between messages (in minutes)
-            time_interval = random.randint(30, 90)  # Random interval between 30 and 90 minutes
+            # Randomly decide if the time interval should be short (1-2 minutes) or longer (30-90 minutes)
+            if random.random() < 0.3:  # 30% chance to shorten the interval (can adjust this probability)
+                time_interval = random.randint(1, 2)  # 1-2 minutes
+            else:
+                time_interval = random.randint(30, 90)  # 30-90 minutes
+
+            # Calculate the message's timestamp
             message_timestamp = timestamp + timedelta(minutes=time_interval)
 
             # Update the timestamp for the next message
@@ -221,8 +221,8 @@ def generate_messages(num_chats, num_messages):
 
 def generate_random_date():
     """Generate a random date between January 1, 2022 and December 31, 2025"""
-    start_date = datetime(2022, 1, 1)
-    end_date = datetime(2025, 12, 31)
+    start_date = datetime(2024, 1, 1)
+    end_date = datetime(2024, 12, 31)
     delta = end_date - start_date
     random_days = random.randint(0, delta.days)
     random_date = start_date + timedelta(days=random_days)

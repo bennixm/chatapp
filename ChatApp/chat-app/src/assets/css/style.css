@@ -448,7 +448,9 @@ ul{
     color:white;
     font-weight: bold;
     text-align: left;
-    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .chat-item-content .user-chat{
     padding:5px;
@@ -791,6 +793,7 @@ button {
     padding:10px;
     border-bottom: 2px solid #ffffff21;
     padding-bottom:20px;
+    justify-content: space-between;
 }
 .chat-head .chat-img{
     padding: 5px;
@@ -932,4 +935,41 @@ button {
     width:100%;
     display:flex;
     flex-direction: row;
+}
+.chat-user-heading{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+.chat-button-heading{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+}
+.chat-button-heading button{
+    padding:10px;
+    color:white;
+    font-size:16px;
+    transition:all .5s;
+    background-color: transparent;
+    border:none;
+}
+.chat-button-heading button:hover{
+    background-color: #00f5d424;
+}
+.graphs-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+.graph {
+    text-align: center;
+}
+.graph img {
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+    margin-top: 10px;
 }
