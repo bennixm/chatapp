@@ -3,8 +3,8 @@ from flask_cors import CORS
 import mysql.connector
 from datetime import datetime
 import generators  # we take all the generators from generators.py
-from getters import get_user_count, get_messages  # we take the user count function from getters
-
+from getters import get_stats, get_messages, get_monthly_message_counts, get_message_sentiments  # we take all from getters
+import json
 import pandas as pd
 import numpy as np
 import requests
@@ -29,9 +29,9 @@ CORS(app, origins=["http://localhost:8081"])
 @app.route("/stats", methods=["GET"])
 def stats():
     # Fetch user count using the function from getters.py
-    user_count = get_user_count()
+    stats = get_stats()
 
-    return jsonify({"user_count": user_count})
+    return jsonify(stats)
 
 @app.route("/generate_users", methods=["POST"])
 def generate_users():
@@ -342,6 +342,23 @@ def generate_graph():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/get_monthly_message_counts", methods=["GET"])
+def get_monthly_message_counts_endpoint():
+    try:
+        monthly_counts = get_monthly_message_counts()
+        return monthly_counts
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch monthly message counts: {str(e)}"}), 500
+
+@app.route("/get_message_sentiments", methods=["GET"])
+def get_message_sentiments_endpoint():
+    try:
+        logging.info("Request received for /get_message_sentiments")  # Add logging here
+        messages_with_sentiment = get_message_sentiments()
+        return jsonify(messages_with_sentiment)
+    except Exception as e:
+        logging.error(f"Error in /get_message_sentiments: {e}")  # More specific logging here
+        return jsonify({"error": f"Failed to fetch message sentiments: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
