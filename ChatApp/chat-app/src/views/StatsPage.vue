@@ -6,8 +6,39 @@ import "vue-data-ui/style.css";
 
 // we create the configs here
 
+const timepredictionConfig = ref({
+  animationFrames: 60,
+  animationValueStart: 0,
+  backgroundColor: '#00000040',
+  fontFamily: 'inherit',
+  layoutClass: 'p-4 m-4 rounded-md shadow',
+  layoutCss: '',
+  prefix: '',
+  suffix: '',
+  title: 'Response time of User (minutes)',
+  titleBold: true,
+  titleColor: '#ffffff',
+  titleClass: '',
+  titleCss: '',
+  titleFontSize: 16,
+  useAnimation: true,
+  valueBold: true,
+  valueColor: '#009ca6',
+  valueClass: '',
+  valueCss: '',
+  valueFontSize: 32,
+  valueRounding: 0,
+  formatter: null,
+  analogDigits: {
+    show: false,
+    height: 40,
+    color: '#1A1A1Aff',
+    skeletonColor: '#E1E5E8'
+  }
+});
+
 const sparklineConfig = ref(
-    {"style":{"backgroundColor":"#00000073","chartWidth":350,"area":{"show":true,"color":"#009ca6"},"dataLabel":{"fontSize":44,"color":"#CCCCCC"},"line":{"color":"#009ca6"},"title":{"color":"#009ca6","text":"Monthly messages in 2024"}}}
+    {"style":{"backgroundColor":"#00000040","chartWidth":350,"area":{"show":true,"color":"#009ca6"},"dataLabel":{"fontSize":44,"color":"#CCCCCC"},"line":{"color":"#009ca6"},"title":{"color":"#009ca6","text":"Monthly messages in 2024"}}}
 );
 const sparklineDataset = ref([]);
 const moodConfig = ref({
@@ -15,7 +46,7 @@ const moodConfig = ref({
     style: {
       fontFamily: 'inherit',
       chart: {
-        backgroundColor: '#00000073',
+        backgroundColor: '#00000040',
         color: '#ffffffff',
         layout: {
           grid: {
@@ -75,7 +106,7 @@ const moodConfig = ref({
         legend: {
           show: true,
           bold: false,
-          backgroundColor: '#000000ff',
+          backgroundColor: '#000000a1',
           color: '#ffffffff',
           fontSize: 14,
           roundingValue: 0,
@@ -189,12 +220,12 @@ const donutConfig = ref({
     show: false,
     responsiveBreakpoint: 400,
     th: {
-      backgroundColor: '#000000ff',
+      backgroundColor: '#000000a1',
       color: '#ffffffff',
       outline: 'none'
     },
     td: {
-      backgroundColor: '#000000ff',
+      backgroundColor: '#000000a1',
       color: '#ffffffff',
       outline: 'none',
       roundingValue: 0,
@@ -211,7 +242,7 @@ const donutConfig = ref({
     chart: {
       useGradient: true,
       gradientIntensity: 40,
-      backgroundColor: '#00000073',
+      backgroundColor: '#00000040',
       color: '#ffffffff',
       layout: {
         labels: {
@@ -296,7 +327,7 @@ const donutConfig = ref({
       legend: {
         show: true,
         bold: false,
-        backgroundColor: '#000000ff',
+        backgroundColor: '#000000a1',
         color: '#ffffffff',
         fontSize: 16,
         roundingValue: 0,
@@ -329,7 +360,7 @@ const donutConfig = ref({
         paddingRight: 0,
         subtitle: {
           color: '#A1A1A1ff',
-          text: 'platform overview',
+          text: 'Platform data overview',
           fontSize: 16,
           bold: false
         }
@@ -444,9 +475,21 @@ const fetchMoodData = async () => {
   }
 };
 
+const trainmodel =  async () => {
+  try {
+    const response = await axios.get("http://localhost:5001/train");
+    if (response.data.message) {
+      console.log("Model Training Started: Training is in progress.");
+    }
+  } catch (error) {
+    console.log("Training Failed: Error occurred while training.");
+  }
+};
+
 
 
 // we load the methods here with reload
+trainmodel();
 fetchSparkLine();
 fetchMoodData();
 fetchStats();
@@ -478,30 +521,32 @@ fetchStats();
     <div class="stats-content">
       <div class="content-page">
         <div class="stats-item">
-        <VueDataUi
-            component="VueUiSparkline"
-            :dataset="sparklineDataset"
-            :config="sparklineConfig"
-        />
+          <VueDataUi
+              component="VueUiMoodRadar"
+              :config="moodConfig"
+              :dataset="moodDataset"
+          />
         </div>
         <div class="stats-item">
-        <VueDataUi
-            component="VueUiMoodRadar"
-            :config="moodConfig"
-            :dataset="moodDataset"
-        />
-        </div>
-        <div v-if="prediction !== null" class="result">
-          <h2>Predicted Response Time: {{ formattedPrediction }}</h2>
+          <div class="stats-item-small">
+            <VueDataUi
+                component="VueUiSparkline"
+                :dataset="sparklineDataset"
+                :config="sparklineConfig"
+            />
+          </div>
+          <div class="stats-item-small" v-if="prediction !== null">
+              <VueDataUi
+                  component="VueUiKpi"
+                  :config="timepredictionConfig"
+                  :dataset="formattedPrediction"
+              />
+          </div>
         </div>
       </div>
       <div class="search-nav">
-        <button @click="trainModel" class="train-btn" :disabled="isTraining">
-          {{ isTraining ? "Training in Progress..." : "Train Model" }}
-        </button>
         <form @submit.prevent="predictResponseTime" class="form">
           <input v-model="sender_id" type="number" placeholder="Enter user id.." required />
-
           <button type="submit" class="predict-btn">Predict Response Time</button>
         </form>
       </div>
@@ -511,7 +556,9 @@ fetchStats();
 
       </div>
       <div class="search-nav">
-        <button @click="fetchSparkLine">Generate Graphs</button>
+        <button @click="trainModel" class="train-btn" :disabled="isTraining">
+          {{ isTraining ? "Training in Progress..." : "Train Model" }}
+        </button>
       </div>
     </div>
   </div>
@@ -528,16 +575,13 @@ export default {
       user_count: 0,
       sender_id: "",
       prediction: null,
-      isTraining: false,
       graphs: null,
     };
   },
   computed: {
     formattedPrediction() {
-      if (this.prediction === null) return "";
-      const minutes = Math.floor(this.prediction / 60);
-      const seconds = Math.round(this.prediction % 60);
-      return minutes > 0 ? `${minutes} min ${seconds} sec` : `${seconds} sec`;
+      if (this.prediction === null) return null;
+      return this.prediction / 60;
     }
   },
   methods: {
@@ -608,19 +652,6 @@ export default {
         this.showError("Failed to generate chats");
       }
     },
-    async trainModel() {
-      this.isTraining = true;
-      try {
-        const response = await axios.get("http://localhost:5001/train");
-        if (response.data.message) {
-          this.showSuccess("Model Training Started: Training is in progress.");
-        }
-      } catch (error) {
-        this.showError("Training Failed: Error occurred while training.");
-      } finally {
-        this.isTraining = false;
-      }
-    },
     async predictResponseTime() {
       if (!this.sender_id) {
         Swal.fire({ icon: "warning", title: "Missing Input", text: "Please enter a User ID." });
@@ -633,9 +664,6 @@ export default {
         this.showError("Prediction Failed: Ensure the model is trained and input is correct.");
       }
     }
-  },
-  mounted() {
-    this.trainModel();
   }
 };
 </script>

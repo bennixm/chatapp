@@ -278,68 +278,52 @@ def generate_graph():
             'day_of_week': day_of_week
         })
 
-        # Create a BytesIO buffer to store the image
-        img = BytesIO()
+        # Graph 1: Response Time by Hour of the Day
+        response_time_by_hour = df.groupby('hour_of_day')['response_time'].describe().reset_index()
+        graph_1_data = {
+            'x': response_time_by_hour['hour_of_day'].tolist(),
+            'y': response_time_by_hour['mean'].tolist(),
+            'y_error': (response_time_by_hour['75%'] - response_time_by_hour['25%']).tolist(),
+            'label': 'Response Time by Hour of the Day'
+        }
 
-        # Plot 1: Response Time by Hour of the Day
-        plt.figure(figsize=(10, 6))
-        sns.boxplot(data=df, x='hour_of_day', y='response_time')
-        plt.title('Response Time by Hour of the Day')
-        plt.xlabel('Hour of the Day')
-        plt.ylabel('Response Time (seconds)')
-        plt.grid(True)
-        plt.savefig(img, format='png')
-        img.seek(0)
-        img_data_1 = base64.b64encode(img.getvalue()).decode('utf-8')
-        plt.clf()  # Clear the current figure
+        # Graph 2: Response Time by Day of the Week
+        response_time_by_day = df.groupby('day_of_week')['response_time'].describe().reset_index()
+        graph_2_data = {
+            'x': response_time_by_day['day_of_week'].tolist(),
+            'y': response_time_by_day['mean'].tolist(),
+            'y_error': (response_time_by_day['75%'] - response_time_by_day['25%']).tolist(),
+            'labels': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            'label': 'Response Time by Day of the Week'
+        }
 
-        # Plot 2: Response Time by Day of the Week
-        plt.figure(figsize=(10, 6))
-        sns.boxplot(data=df, x='day_of_week', y='response_time')
-        plt.title('Response Time by Day of the Week')
-        plt.xlabel('Day of the Week')
-        plt.ylabel('Response Time (seconds)')
-        plt.grid(True)
-        plt.xticks([0, 1, 2, 3, 4, 5, 6], ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
-        plt.savefig(img, format='png')
-        img.seek(0)
-        img_data_2 = base64.b64encode(img.getvalue()).decode('utf-8')
-        plt.clf()
-
-        # Plot 3: User's Average Response Time by Sender
+        # Graph 3: User's Average Response Time by Sender
         avg_response_time = df.groupby('sender_id')['response_time'].mean().reset_index()
-        plt.figure(figsize=(10, 6))
-        sns.barplot(data=avg_response_time, x='sender_id', y='response_time')
-        plt.title('Average Response Time by Sender')
-        plt.xlabel('Sender ID')
-        plt.ylabel('Average Response Time (seconds)')
-        plt.savefig(img, format='png')
-        img.seek(0)
-        img_data_3 = base64.b64encode(img.getvalue()).decode('utf-8')
-        plt.clf()
+        graph_3_data = {
+            'x': avg_response_time['sender_id'].tolist(),
+            'y': avg_response_time['response_time'].tolist(),
+            'label': 'Average Response Time by Sender'
+        }
 
-        # Plot 4: Time Since Last Message vs Response Time
+        # Graph 4: Time Since Last Message vs Response Time
         df['time_since_last_message'] = df.groupby('sender_id')['timestamp'].diff().dt.total_seconds().fillna(0)
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df, x='time_since_last_message', y='response_time', hue='sender_id', palette='Set1')
-        plt.title('Time Since Last Message vs Response Time')
-        plt.xlabel('Time Since Last Message (seconds)')
-        plt.ylabel('Response Time (seconds)')
-        plt.grid(True)
-        plt.savefig(img, format='png')
-        img.seek(0)
-        img_data_4 = base64.b64encode(img.getvalue()).decode('utf-8')
-        plt.clf()
+        graph_4_data = {
+            'x': df['time_since_last_message'].tolist(),
+            'y': df['response_time'].tolist(),
+            'hue': df['sender_id'].tolist(),
+            'label': "Time Since Last Message vs Response Time"
+        }
 
         return jsonify({
-            "graph_1": img_data_1,
-            "graph_2": img_data_2,
-            "graph_3": img_data_3,
-            "graph_4": img_data_4
+            "graph_1": graph_1_data,
+            "graph_2": graph_2_data,
+            "graph_3": graph_3_data,
+            "graph_4": graph_4_data
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route("/get_monthly_message_counts", methods=["GET"])

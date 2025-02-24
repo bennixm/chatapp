@@ -44,7 +44,7 @@
               <div class="chat-item-identity"></div>
               <div class="chat-item-content">
                 <div class="user-name">{{ friend.username }}</div>
-                <div class="user-chat">.....</div>
+                <div class="user-chat"><i class="fa fa-commenting-o" aria-hidden="true"></i></div>
               </div>
             </div>
           </router-link>
