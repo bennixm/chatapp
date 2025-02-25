@@ -91,30 +91,106 @@ There is also posibility to run it with docker (if you have it setted) :
 
 ### Folder Structure
 
-```plaintext
-chat-application/
-├── backend/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/chatapp/chat/
-│   │   │   │   ├── controller/        # REST API controllers
-│   │   │   │   ├── model/             # Database models
-│   │   │   │   ├── repository/        # JPA repositories
-│   │   │   │   ├── service/           # Business logic
-│   │   │   │   └── ChatApplication.java # Spring Boot entry point
-│   │   ├── resources/
-│   │   │   ├── application.properties  # Database and server configurations
-│   ├── pom.xml                        # Maven dependencies for Spring Boot
-├── chat-app/
-│   ├── src/
-│   │   ├── assets/                    # Static assets (images, styles)
-│   │   ├── components/                # Vue.js components (Registration, Login, Search, Chat, Sidebar)
-│   │   ├── views/                     # Vue.js views (Home, Login, Register, etc.)
-│   │   ├── store/                     # Vuex store for state management
-│   │   ├── App.vue                    # Main Vue component
-│   │   └── main.js                    # Entry point for Vue.js
-└── .env                               # Environment variables (MySQL connection, JWT secret, etc.)
+```
+📦 chatapp
+├─ chat-app (VueJS)
+│  ├─ node_modules
+│  ├─ service
+DockerFile
+package.json
+jsconfig.json
+│  ├─ src
+│  │  ├─ App.vue
+main.js
+│  │  ├─ views
+│  │  │  ├─ ChatPage.vue
+│  │  │  ├─ Dashboard.vue
+│  │  │  ├─ ChatWindow.vue
+│  │  │  ├─ HomePage.vue
+│  │  │  ├─ Login.vue
+│  │  │  ├─ NewChat.vue
+│  │  │  ├─ Search.vue
+│  │  │  ├─ Register.vue
+│  │  │  ├─ Settings.vue
+│  │  │  └─ StatsPage.vue
+│  │  ├─ router
+│  │  │  └─ index.js
+│  │  ├─ events
+│  │  │  └─ eventBus.j
+│  │  ├─ components
+│  │  │  ├─ Footer.vue
+│  │  │  └─ Nav.vue
+│  │  └─ assets
+│  │     ├─ font-awesome
+│  │     ├─ images
+│  │     └─ css
+│  │        └─ style.cs
+│  └─ public
+│     └─ index.html
+└─ backend (Java Spring)
+   ├─ src
+   │  └─ main
+   │     └─ java
+   │        └─ com
+   │           └─ example
+   │              └─ chatapp
+   │                 ├─ Config
+   │                 ├─ Dto
+   │                 ├─ Entity
+   │                 ├─ payload
+   │                 ├─ Repository
+   │                 ├─ Service
+   │                 ├─ UserController
+   │                 └─ ChatappApplication.java
+   ├─ target
+   │  └─ classes
+   │     └─ com
+   │        └─ application.propertie
+   ├─ DockerFile
+   └─ pom.xm
+```
+# Scientific Part Of Web Chat App
+# Installation
+
+```
+📦 py-service
+├─ app.py
+├─ db_conn.py
+├─ DockerFile
+├─ generators.py
+├─ openaiconfig.py
+└─ requirements.txt
 ```
 
+1. **Clone the repository**:
 
+   ```bash
+   git clone https://github.com/yourusername/chat-app.git
+   cd chat-app
+
+- **Install dependencies**:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+- **Set up the database**:  
+    Ensure you have a MySQL database set up and configured. Update the database connection settings in `db_conn.py`.
+
+- **Run the application**:
+
+    ```bash
+    python app.py
+    ```
+
+    The Flask app will start running on `http://localhost:5001`.
+
+- **Running in Docker**:
+
+    To build and run the application in Docker:
+
+    ```bash
+    docker build -t chat-app .
+    docker run -p 5001:5001 chat-app
+    ```
 
