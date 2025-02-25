@@ -278,13 +278,33 @@ def generate_graph():
             'day_of_week': day_of_week
         })
 
-        # Graph 1: Response Time by Hour of the Day
+        # Calculate Open (first response time for each hour)
+        open_values = df.groupby('hour_of_day')['response_time'].first().reset_index()
+
+        # Calculate Close (last response time for each hour)
+        close_values = df.groupby('hour_of_day')['response_time'].last().reset_index()
+
+        # Calculate the mean and error margin (Interquartile range) for each hour
         response_time_by_hour = df.groupby('hour_of_day')['response_time'].describe().reset_index()
+
+        # Calculate the error margin (Interquartile range)
+        y_error_values = (response_time_by_hour['75%'] - response_time_by_hour['25%']).tolist()
+
+        # Compute high and low for candlestick chart
+        high_values = (response_time_by_hour['mean'] + (pd.Series(y_error_values) / 2)).tolist()  # Element-wise division
+        low_values = (response_time_by_hour['mean'] - (pd.Series(y_error_values) / 2)).tolist()  # Element-wise division
+
+        # Calculate volume (number of samples per hour)
+        volume_by_hour = df.groupby('hour_of_day').size().tolist()
+
+        # Prepare Graph 1 Data
         graph_1_data = {
             'x': response_time_by_hour['hour_of_day'].tolist(),
-            'y': response_time_by_hour['mean'].tolist(),
-            'y_error': (response_time_by_hour['75%'] - response_time_by_hour['25%']).tolist(),
-            'label': 'Response Time by Hour of the Day'
+            'open': open_values['response_time'].tolist(),  # Open values (first response time)
+            'close': close_values['response_time'].tolist(),  # Close values (last response time)
+            'high': high_values,  # High (mean + error/2)
+            'low': low_values,  # Low (mean - error/2)
+            'volume': volume_by_hour  # Volume (number of samples)
         }
 
         # Graph 2: Response Time by Day of the Week
@@ -314,6 +334,7 @@ def generate_graph():
             'label': "Time Since Last Message vs Response Time"
         }
 
+        # Return the updated data for frontend
         return jsonify({
             "graph_1": graph_1_data,
             "graph_2": graph_2_data,
@@ -323,6 +344,8 @@ def generate_graph():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 
 

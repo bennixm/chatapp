@@ -71,7 +71,7 @@ const moodConfig = ref({
           smileys: {
             strokeWidth: 1,
             colors: {
-              '1': 'rgba(168, 0, 0, 1)',
+              '1': '#a80000',
               '2': '#ff9f03',
               '3': '#ffd004',
               '4': '#9ac900',
@@ -98,7 +98,7 @@ const moodConfig = ref({
           paddingRight: 0,
           subtitle: {
             color: '#ffffffff',
-            text: 'General mood on platform',
+            text: 'Mood of messages',
             fontSize: 16,
             bold: false
           }
@@ -395,6 +395,11 @@ const donutDataset =  ref([
   }
 ]);
 
+const candlestickConfig = ref( {"responsive":false,"theme":"","useCssAnimation":true,"style":{"fontFamily":"inherit","backgroundColor":"#00000040","color":"#ffffff","height":316,"width":512,"layout":{"padding":{"top":36,"right":48,"bottom":36,"left":48},"selector":{"color":"#ffffff","opacity":10},"grid":{"show":true,"stroke":"#e1e5e8","strokeWidth":0.5,"xAxis":{"dataLabels":{"show":true,"fontSize":10,"color":"#ffffff","offsetY":0,"bold":false,"rotation":0}},"yAxis":{"dataLabels":{"show":true,"fontSize":12,"color":"#ffffff","roundingValue":0,"offsetX":0,"bold":false,"steps":10,"prefix":"","suffix":""}}},"wick":{"stroke":"#ffffff","strokeWidth":0.5,"extremity":{"shape":"line","size":"auto","color":"#ffffff"}},"candle":{"borderRadius":1,"stroke":"#ffffff","strokeWidth":0.5,"colors":{"bearish":"#dc3912","bullish":"#2ca02c"},"gradient":{"show":true,"underlayer":"#FFFFFF"},"widthRatio":0.5}},"zoom":{"show":true,"color":"#CCCCCC","highlightColor":"#4A4A4A","fontSize":14,"useResetSlot":false,"startIndex":null,"endIndex":null,"enableRangeHandles":true,"enableSelectionDrag":true},"title":{"text":"Response time / hour","color":"#ffffff","fontSize":20,"bold":true,"textAlign":"center","paddingLeft":0,"paddingRight":0,"subtitle":{"color":"#A1A1A1","text":"Response Time by Hour of the Day","fontSize":16,"bold":false}},"tooltip":{"show":true,"color":"#ffffff","backgroundColor":"#FFFFFF","fontSize":14,"customFormat":null,"borderRadius":4,"borderColor":"#e1e5e8","borderWidth":1,"backgroundOpacity":100,"position":"center","offsetY":24,"roundingValue":0,"prefix":"","suffix":""}},"translations":{"period":"Period","open":"Open","high":"High","low":"Low","last":"Last","volume":"Volume"},"userOptions":{"show":true,"showOnChartHover":false,"keepStateOnChartLeave":true,"position":"right","buttons":{"tooltip":true,"pdf":true,"csv":true,"img":true,"table":true,"labels":false,"fullscreen":true,"sort":false,"stack":false,"animation":false,"annotator":true},"buttonTitles":{"open":"Open options","close":"Close options","tooltip":"Toggle tooltip","pdf":"Download PDF","csv":"Download CSV","img":"Download PNG","table":"Toggle table","fullscreen":"Toggle fullscreen","annotator":"Toggle annotator"}},"table":{"show":false,"responsiveBreakpoint":400,"th":{"backgroundColor":"#fafafa","color":"#ffffff","outline":"none"},"td":{"backgroundColor":"#FFFFFF","color":"#ffffff","outline":"none","roundingValue":2,"prefix":"","suffix":""}}});
+
+const candlestickDataset = [];
+
+
 // we create the methods here for setup
 
 const fetchStats = async () => {
@@ -486,6 +491,45 @@ const trainmodel =  async () => {
   }
 };
 
+async function fetchGraphs() {
+  try {
+    const response = await axios.get("http://localhost:5001/generate_graph");
+    console.log(response.data);  // Log the full response to inspect its structure
+
+    Object.keys(response.data).forEach((graphKey) => {
+      const graphData = response.data[graphKey];
+
+      // Ensure that x, y, and y_error arrays exist and are not empty
+      if (graphKey === "graph_1") {
+
+        graphData.x.forEach((hour, index) => {
+          const open = graphData.open[index];  // Mean response time (open value)
+          const high = graphData.high[index];  // High estimate (mean + error/2)
+          const low = graphData.low[index];  // Low estimate (mean - error/2)
+          const close = graphData.close[index];  // Close is the same as open if there's no real close data, but you could update this if you have a close price for each period
+          const volume = graphData.volume[index];  // Assuming you have volume data or else random volume
+
+          // Format the time value as just the hour (e.g., '00:00', '01:00', etc.)
+          const time = `${String(hour).padStart(2, '0')}`; // Only the hour part
+
+          // Update candlestickDataset with the new values
+          candlestickDataset[index] = [
+            time,  // Timestamp (formatted with only the hour)
+            open,  // Open value (Mean response time)
+            high,  // High value (Mean + Error/2)
+            low,   // Low value (Mean - Error/2)
+            close, // Close value (same as open for simplicity unless you have real close data)
+            volume // Volume (real or random fallback)
+          ];
+        });
+      }
+    });
+
+  } catch (error) {
+    console.error('Failed to fetch graphs data:', error);
+  }
+}
+
 
 
 // we load the methods here with reload
@@ -493,6 +537,7 @@ trainmodel();
 fetchSparkLine();
 fetchMoodData();
 fetchStats();
+fetchGraphs();
 
 </script>
 
@@ -553,7 +598,11 @@ fetchStats();
     </div>
     <div class="stats-content">
       <div class="content-page">
-
+        <VueDataUi
+            component="VueUiCandlestick"
+            :dataset="candlestickDataset"
+            :config="candlestickConfig"
+        />
       </div>
       <div class="search-nav">
         <button @click="trainModel" class="train-btn" :disabled="isTraining">
