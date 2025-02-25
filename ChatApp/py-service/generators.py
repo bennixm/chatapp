@@ -186,6 +186,7 @@ def generate_messages(num_chats, num_messages):
             conversation.append(user2_message)
 
         # Generate a random starting date between 2022 and 2025
+
         start_date = generate_random_date()
         timestamp = start_date  # This will be the timestamp for the first message
 

@@ -264,7 +264,7 @@ def generate_graph():
         # Generate dummy data (representing the features)
         num_samples = 1000
         sender_ids = np.random.choice([1, 2, 3, 4, 5], num_samples)
-        timestamps = pd.date_range('2024-01-01', periods=num_samples, freq='h')
+        timestamps = pd.date_range('2024-03-03', periods=num_samples, freq='h')
         response_times = np.random.gamma(2, 5, num_samples)
         hours_of_day = timestamps.hour
         day_of_week = timestamps.dayofweek

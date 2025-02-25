@@ -524,6 +524,9 @@ ul{
     padding:2%;
     padding-top:1vh;
 }
+.stats-content .content-page .vue-ui-candlestick{
+    overflow: hidden;
+}
 .stats-content .content-page{
     flex-direction: row !IMPORTANT;
     justify-content: space-between;
