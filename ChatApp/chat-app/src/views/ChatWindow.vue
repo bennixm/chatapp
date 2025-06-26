@@ -39,6 +39,7 @@ import { useStore } from 'vuex';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import Swal from 'sweetalert2';
+import { onBeforeRouteUpdate } from 'vue-router';
 
 export default {
   props: ["receiverId"],
@@ -191,6 +192,12 @@ export default {
 
     watch(showTime, () => {
       messages.value = [...messages.value];
+    });
+
+
+    onBeforeRouteUpdate(async (to, from, next) => {
+      await fetchOrCreateChat();
+      next();
     });
 
     watch(() => props.receiverId, fetchOrCreateChat, { immediate: true });
