@@ -29,7 +29,10 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
-import Swal from 'sweetalert2';
+import {
+  showSuccessAlert,
+  showErrorAlert
+} from '@/utils/alertService';
 
 export default {
   name: 'LoginPage',
@@ -47,106 +50,33 @@ export default {
         const response = await axios.post("http://localhost:8085/api/v1/user/login", user);
 
         if (response.data.username && response.data.userId) {
-
-          Swal.fire({
-            icon: "success",
-            title: "Login Successful!",
-            text: "Welcome back!",
-            timer: 2000,
-            showConfirmButton: false,
-            customClass: {
-              popup: "custom-popup",
-            },
-            background: "#000000e0",
-            color: "#ffffff",
-            confirmButtonColor: "#009ca6",
-            heightAuto:false
-          });
+          await showSuccessAlert("Login Successful!", "Welcome back!");
 
           setTimeout(() => {
             store.commit('setUsername', response.data.username);
             store.commit('setUserId', response.data.userId);
             router.push({ name: 'DashboardPage' });
           }, 2000);
-
         } else {
-
-          Swal.fire({
-            icon: "error",
-            title: "Login Failed",
-            text: response.data.message || "Incorrect Email or Password!",
-            customClass: {
-              popup: "custom-popup",
-            },
-            background: "#000000e0",
-            color: "#ffffff",
-            confirmButtonColor: "#009ca6",
-            heightAuto:false
-          });
+          await showErrorAlert(
+              "Login Failed",
+              response.data.message || "Incorrect Email or Password!"
+          );
         }
 
       } catch (error) {
+        const status = error.response?.status;
+        const message = error.response?.data?.message;
 
-        if (error.response && error.response.status === 401) {
-
-          const errorMessage = error.response.data.message || "Incorrect Email or Password!";
-          Swal.fire({
-            icon: "error",
-            title: "Unauthorized",
-            text: errorMessage,
-            customClass: {
-              popup: "custom-popup",
-            },
-            background: "#000000e0",
-            color: "#ffffff",
-            confirmButtonColor: "#009ca6",
-            heightAuto:false
-          });
-
-        } else if (error.response && error.response.status === 500) {
-
-          Swal.fire({
-            icon: "error",
-            title: "Server Error",
-            text: "Something went wrong on our end. Please try again later.",
-            customClass: {
-              popup: "custom-popup",
-            },
-            background: "#000000e0",
-            color: "#ffffff",
-            confirmButtonColor: "#009ca6",
-            heightAuto:false
-          });
-
-        } else if (error.response && error.response.status === 404) {
-
-          Swal.fire({
-            icon: "error",
-            title: "Not Found",
-            text: "The requested resource was not found.",
-            customClass: {
-              popup: "custom-popup",
-            },
-            background: "#000000e0",
-            color: "#ffffff",
-            confirmButtonColor: "#009ca6",
-            heightAuto:false
-          });
+        if (status === 401) {
+          await showErrorAlert("Unauthorized", message || "Incorrect Email or Password!");
+        } else if (status === 500) {
+          await showErrorAlert("Server Error", "Something went wrong on our end. Please try again later.");
+        } else if (status === 404) {
+          await showErrorAlert("Not Found", "The requested resource was not found.");
         } else {
-
           console.error("An error occurred:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Something went wrong, please try again.",
-            customClass: {
-              popup: "custom-popup",
-            },
-            background: "#000000e0",
-            color: "#ffffff",
-            confirmButtonColor: "#009ca6",
-            heightAuto:false
-          });
+          await showErrorAlert("Error", "Something went wrong, please try again.");
         }
       }
     };

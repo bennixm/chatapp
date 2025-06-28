@@ -7,20 +7,21 @@
       <div class="search-section" v-if="!loading">
         <div class="search-section-content" v-if="users.length">
           <div class="users-fetch">
-          <div class="display-user-item" v-for="user in currentPageUsers" :key="user.userid">
-            <div class="user-item-identity"></div>
-            <div class="user-item-content">
-              <span class="username">{{ user.username }}</span>
-              <span class="email">{{ user.email }}</span>
+            <div class="display-user-item" v-for="user in currentPageUsers" :key="user.userid">
+              <div class="user-item-identity"></div>
+              <div class="user-item-content">
+                <span class="username">{{ user.username }}</span>
+                <span class="email">{{ user.email }}</span>
+              </div>
+              <div class="user-item-buttons">
+                <button
+                    v-if="!isFriend(user.userid)"
+                    @click="sendFriendRequest(user.userid)"
+                    class="send-request-button">
+                  <i class="fa fa-user-plus" aria-hidden="true"></i> Add
+                </button>
+              </div>
             </div>
-            <div class="user-item-buttons">
-              <button
-                  v-if="!isFriend(user.userid)"
-                  @click="sendFriendRequest(user.userid)" class="send-request-button">
-                <i class="fa fa-user-plus" aria-hidden="true"></i> Add
-              </button>
-            </div>
-          </div>
           </div>
           <div class="pagination">
             <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
@@ -37,7 +38,7 @@
                 type="text"
                 v-model="searchQuery"
                 placeholder="Search by username"
-                @input="filterUsers"/>
+                @input="filterUsers" />
           </div>
         </div>
       </div>
@@ -48,7 +49,7 @@
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
-import Swal from "sweetalert2";
+import { showSuccessAlert, showErrorAlert } from '@/utils/alertService';
 
 export default {
   name: "SearchPage",
@@ -81,9 +82,7 @@ export default {
   methods: {
     async fetchUsersAndFriends() {
       try {
-        const allUsersResponse = await axios.get(
-            "http://localhost:8085/api/v1/user/allusers"
-        );
+        const allUsersResponse = await axios.get("http://localhost:8085/api/v1/user/allusers");
         this.allUsers = allUsersResponse.data;
 
         await this.getUserFriends(this.getUserId);
@@ -91,7 +90,6 @@ export default {
         this.users = this.allUsers.filter((user) => {
           const isCurrentUser = user.userid === parseInt(this.getUserId);
           const isFriend = this.isFriend(user.userid);
-
           return !isCurrentUser && !isFriend;
         });
 
@@ -126,41 +124,15 @@ export default {
             }
         );
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Friend Request Sent!',
-          text: response.data.message,
-          timer: 2000,
-          showConfirmButton: false,
-          customClass: {
-            popup: "custom-popup",
-          },
-          background: "#000000e0",
-          color: "#ffffff",
-          confirmButtonColor: "#009ca6",
-          heightAuto: false
-        });
+        await showSuccessAlert('Friend Request Sent!', response.data.message);
 
         setTimeout(() => {
           this.fetchUsersAndFriends();
         }, 2000);
       } catch (error) {
         console.error("Error sending friend request:", error);
-
         const errorMessage = error.response?.data?.errorMessage || 'Error sending friend request.';
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Error!',
-          text: errorMessage,
-          customClass: {
-            popup: "custom-popup",
-          },
-          background: "#000000e0",
-          color: "#ffffff",
-          confirmButtonColor: "#009ca6",
-          heightAuto:false
-        });
+        await showErrorAlert('Error!', errorMessage);
       }
     },
     filterUsers() {

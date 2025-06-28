@@ -38,8 +38,8 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
-import Swal from 'sweetalert2';
 import { onBeforeRouteUpdate } from 'vue-router';
+import { showErrorAlert } from '@/utils/alertService';
 
 export default {
   props: ["receiverId"],
@@ -51,7 +51,7 @@ export default {
     const messages = ref([]);
     const newMessage = ref("");
     const receiverUsername = ref("");
-    const showTime = ref(false); // State to toggle time format
+    const showTime = ref(false);
 
     let stompClient = null;
 
@@ -71,13 +71,13 @@ export default {
 
     const fetchOrCreateChat = async () => {
       try {
-        let response = await axios.get(`http://localhost:8085/api/chats/${senderId}/${props.receiverId}`, {
-          headers: {
-            'Accept': 'application/json'
-          }
+        const response = await axios.get(`http://localhost:8085/api/chats/${senderId}/${props.receiverId}`, {
+          headers: { 'Accept': 'application/json' }
         });
         chat.value = response.data;
-        receiverUsername.value = chat.value.user1Username === sessionUsername ? chat.value.user2Username : chat.value.user1Username;
+        receiverUsername.value = chat.value.user1Username === sessionUsername
+            ? chat.value.user2Username
+            : chat.value.user1Username;
         fetchMessages();
         connectWebSocket();
       } catch (error) {
@@ -99,18 +99,7 @@ export default {
 
     const sendMessageToChat = async () => {
       if (newMessage.value.length > 250) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Message too long',
-          text: 'Your message cannot exceed 250 characters.',
-          customClass: {
-            popup: "custom-popup",
-          },
-          background: "#000000e0",
-          color: "#ffffff",
-          confirmButtonColor: "#009ca6",
-          heightAuto:false
-        });
+        await showErrorAlert('Message too long', 'Your message cannot exceed 250 characters.');
         return;
       }
 
@@ -157,7 +146,6 @@ export default {
 
       const yesterday = new Date(now);
       yesterday.setDate(now.getDate() - 1);
-
       if (yesterday.toDateString() === messageTime.toDateString()) {
         return `Yesterday, ${timeString}`;
       }
@@ -166,15 +154,7 @@ export default {
     };
 
     const sortMessages = () => {
-      messages.value.sort((a, b) => {
-        const timestampA = new Date(a.timestamp);
-        const timestampB = new Date(b.timestamp);
-        if (isNaN(timestampA) || isNaN(timestampB)) {
-          console.error("Invalid timestamp:", a.timestamp, b.timestamp);
-          return 0;
-        }
-        return timestampA - timestampB;
-      });
+      messages.value.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
     };
 
     const scrollToBottom = () => {
@@ -194,7 +174,6 @@ export default {
       messages.value = [...messages.value];
     });
 
-
     onBeforeRouteUpdate(async (to, from, next) => {
       await fetchOrCreateChat();
       next();
@@ -209,8 +188,9 @@ export default {
       sendMessage: sendMessageToChat,
       formatTimestamp,
       receiverUsername,
-      toggleTimeFormat, // Expose the toggle method
+      toggleTimeFormat,
     };
   }
 };
 </script>
+

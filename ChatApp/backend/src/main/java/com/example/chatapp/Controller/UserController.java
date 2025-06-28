@@ -1,4 +1,4 @@
-package com.example.chatapp.UserController;
+package com.example.chatapp.Controller;
 
 import com.example.chatapp.Dto.LoginDTO;
 import com.example.chatapp.Dto.UserDTO;
