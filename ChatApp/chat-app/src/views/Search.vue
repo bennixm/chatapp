@@ -47,9 +47,11 @@
 </template>
 
 <script>
-import axios from "axios";
+
 import { mapGetters } from "vuex";
 import { showSuccessAlert, showErrorAlert } from '@/utils/alertService';
+import secureApi from '../secureApi';
+
 
 export default {
   name: "SearchPage",
@@ -82,7 +84,7 @@ export default {
   methods: {
     async fetchUsersAndFriends() {
       try {
-        const allUsersResponse = await axios.get("http://localhost:8085/api/v1/user/allusers");
+        const allUsersResponse = await secureApi.get("/v1/user/allusers");
         this.allUsers = allUsersResponse.data;
 
         await this.getUserFriends(this.getUserId);
@@ -102,7 +104,7 @@ export default {
     },
     async getUserFriends(userId) {
       try {
-        const response = await axios.get("http://localhost:8085/api/friendship/getfriends", {
+        const response = await secureApi.get("/friendship/getfriends", {
           params: { userId: userId },
         });
         this.friends = response.data;
@@ -116,8 +118,8 @@ export default {
     async sendFriendRequest(receiverId) {
       try {
         const senderId = parseInt(this.getUserId);
-        const response = await axios.post(
-            'http://localhost:8085/api/friendship/send',
+        const response = await secureApi.post(
+            '/friendship/send',
             {
               senderUserid: senderId,
               receiverUserid: receiverId,

@@ -100,9 +100,11 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { mapGetters } from "vuex";
 import { useRouter } from 'vue-router';
-import axios from "axios";
+
 import Swal from "sweetalert2";
 import { eventBus } from '../events/eventBus';
+
+import secureApi from '../secureApi';
 
 export default {
   name: "NavbarComponent",
@@ -134,7 +136,7 @@ export default {
           return;
         }
 
-      const response = await axios.get("http://localhost:8085/api/friendship/getfriends", {
+      const response = await secureApi.get("/friendship/getfriends", {
           params: { userId: userId },
         });
 
@@ -165,7 +167,7 @@ export default {
           return;
         }
 
-        const response = await axios.get("http://localhost:8085/api/friendship/getFriendRequests", {
+        const response = await secureApi.get("/friendship/getFriendRequests", {
           params: { userId: userId },
         });
         this.friendRequests = response.data || [];
@@ -189,7 +191,7 @@ export default {
 
     async updateRequestStatus(friendshipId, status) {
       try {
-        await axios.post(`http://localhost:8085/api/friendship/updateStatusRequest/${friendshipId}`, {
+        await secureApi.post(`/friendship/updateStatusRequest/${friendshipId}`, {
           status: status
         });
 
@@ -238,7 +240,7 @@ export default {
 
     async acceptAllRequests() {
       try {
-        await axios.post("http://localhost:8085/api/friendship/acceptAllRequests", null, {
+        await secureApi.post("/friendship/acceptAllRequests", null, {
           params: { userId: parseInt(this.getUserId) }
         });
 
@@ -288,9 +290,14 @@ export default {
     const router = useRouter();
     const username = computed(() => store.state.username);
 
-    const logout = () => {
-      store.dispatch('logoutUser');
-      router.push('/login');
+    const logout = async () => {
+      try {
+        await secureApi.post('/v1/user/logout', null, { withCredentials: true });
+        store.dispatch('logoutUser');
+        router.push('/login');
+      } catch (error) {
+        console.error('Logout failed:', error);
+      }
     };
 
     return { username, logout };

@@ -30,4 +30,14 @@ public class MyUserDetailsService implements org.springframework.security.core.u
 
         return new org.springframework.security.core.userdetails.User(appUser.getEmail(), appUser.getPassword(), new ArrayList<>());
     }
+
+    public UserDetails loadUserByUsernameFromToken(String username) throws UsernameNotFoundException {
+        AppUser appUser = userRepository.findByUsername(username);
+
+        if (appUser == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+
+        return new User(appUser.getUsername(), appUser.getPassword(), new ArrayList<>());
+    }
 }

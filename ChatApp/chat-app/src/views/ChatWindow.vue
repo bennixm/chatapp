@@ -34,12 +34,12 @@
 
 <script>
 import { ref, watch, nextTick } from 'vue';
-import axios from 'axios';
 import { useStore } from 'vuex';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { showErrorAlert } from '@/utils/alertService';
+import secureApi from '../secureApi';
 
 export default {
   props: ["receiverId"],
@@ -71,7 +71,7 @@ export default {
 
     const fetchOrCreateChat = async () => {
       try {
-        const response = await axios.get(`http://localhost:8085/api/chats/${senderId}/${props.receiverId}`, {
+        const response = await secureApi.get(`/chats/${senderId}/${props.receiverId}`, {
           headers: { 'Accept': 'application/json' }
         });
         chat.value = response.data;
@@ -88,7 +88,7 @@ export default {
     const fetchMessages = async () => {
       if (!chat.value) return;
       try {
-        const response = await axios.get(`http://localhost:8085/api/messages/${chat.value.chatId}`);
+        const response = await secureApi.get(`/messages/${chat.value.chatId}`);
         messages.value = response.data;
         sortMessages();
         scrollToBottom();
@@ -112,7 +112,7 @@ export default {
       };
 
       try {
-        await axios.post(`http://localhost:8085/api/messages/send`, null, {
+        await secureApi.post(`/messages/send`, null, {
           params: { chatId: message.chatId, senderId: message.senderId, content: message.content },
         });
         scrollToBottom();

@@ -47,7 +47,11 @@ export default {
 
     const LoginData = async () => {
       try {
-        const response = await axios.post("http://localhost:8085/api/v1/user/login", user);
+        const response = await axios.post(
+            "http://localhost:8085/api/v1/user/login",
+            user,
+            { withCredentials: true }
+        );
 
         if (response.data.username && response.data.userId) {
           await showSuccessAlert("Login Successful!", "Welcome back!");
