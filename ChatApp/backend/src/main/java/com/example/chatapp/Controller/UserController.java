@@ -124,4 +124,23 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/session")
+    public ResponseEntity<Map<String, String>> checkSession() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            String username = auth.getName();
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Token is valid");
+            response.put("username", username);
+
+            return ResponseEntity.ok(response);
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Invalid or expired token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }
